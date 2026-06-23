@@ -1,0 +1,208 @@
+/* ======================================================
+   AniVerse – Premium Page Styles
+   ====================================================== */
+
+.premium-grid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.premium-card {
+  position: relative;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: visible; /* To allow badges to spill out */
+  backdrop-filter: blur(10px);
+}
+
+.premium-card:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(255, 51, 68, 0.25), 0 0 15px rgba(255, 51, 68, 0.1);
+  border-color: rgba(255, 51, 68, 0.5);
+}
+
+/* Button & Icon Glow on Card Hover */
+.premium-card:hover .btn-premium {
+  box-shadow: 0 0 15px rgba(255, 51, 68, 0.6);
+}
+
+.premium-card:hover .check-icon {
+  color: #ff4d5d;
+  text-shadow: 0 0 10px rgba(255, 51, 68, 0.6);
+  transform: scale(1.1);
+  transition: all 0.3s ease;
+}
+
+/* Badge (ÖNERİLEN / SINIRLI) */
+.premium-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background-color: #ff3344;
+  color: #fff;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 10px rgba(255, 51, 68, 0.4);
+  z-index: 10;
+}
+
+/* Header Area */
+.premium-header {
+  text-align: center;
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 20px;
+}
+
+.premium-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.premium-old-price {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.premium-price {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: var(--font-display);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.premium-discount {
+  color: #ff3344;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.premium-duration {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Features List */
+.premium-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 25px 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Custom Scrollbar for Features */
+.premium-features::-webkit-scrollbar {
+  width: 4px;
+}
+.premium-features::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.premium-features::-webkit-scrollbar-thumb {
+  background: rgba(255, 51, 68, 0.3);
+  border-radius: 4px;
+}
+.premium-features::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 51, 68, 0.8);
+}
+
+.premium-features li {
+  display: flex;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.check-icon {
+  color: #ff3344;
+  font-weight: bold;
+  margin-right: 10px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* Button */
+.btn-premium {
+  width: 100%;
+  background-color: #ff3344;
+  color: white;
+  border: none;
+  border-radius: 8px; /* Hafif oval */
+  padding: 12px 0;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  margin-top: auto;
+}
+
+.btn-premium:hover {
+  background-color: #e62e3d;
+  transform: scale(1.02);
+}
+
+/* Special Card (Sonsuz) */
+.premium-card-special {
+  border-color: rgba(255, 51, 68, 0.3);
+  box-shadow: 0 0 15px rgba(255, 51, 68, 0.5);
+  background: linear-gradient(145deg, rgba(255,51,68,0.08) 0%, rgba(20,20,30,0.9) 100%);
+}
+
+.premium-card-special:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 0 30px rgba(255, 51, 68, 0.8), 0 20px 40px rgba(255, 51, 68, 0.4);
+  border-color: #ff3344;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .premium-grid {
+    gap: 15px;
+  }
+  .premium-card {
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .premium-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  .premium-card {
+    max-width: 100%;
+  }
+  .premium-features {
+    max-height: auto;
+    overflow-y: visible;
+  }
+}

@@ -1,0 +1,211 @@
+/* ======================================================
+   AniVerse – Authentication Page Styles
+   ====================================================== */
+
+.auth-page {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  min-height: 100vh;
+}
+
+.auth-container-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); /* Account for header */
+  padding: 100px 20px 40px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 450px;
+  background: rgba(20, 20, 25, 0.9);
+  border: 1px solid rgba(255, 51, 68, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 51, 68, 0.15);
+  position: relative;
+  height: auto;
+  min-height: 450px;
+  padding-bottom: 30px;
+}
+
+/* Neon glow at the top edge */
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff3344, transparent);
+  opacity: 0.8;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+/* Toggle Buttons */
+.auth-toggle {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toggle-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 20px 0;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.toggle-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.toggle-btn.active {
+  color: #ff3344;
+}
+
+.toggle-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ff3344;
+  box-shadow: 0 -2px 10px rgba(255, 51, 68, 0.5);
+}
+
+/* Form Wrapper */
+.auth-form-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 
+  Instead of absolute positioning which causes clipping, 
+  we use display: none for inactive forms to allow height to auto-adjust 
+*/
+.auth-form {
+  padding: 40px 40px 0 40px;
+  width: 100%;
+  display: none;
+  animation: fadeInForm 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.auth-form.active-form {
+  display: block;
+}
+
+@keyframes fadeInForm {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.form-header h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.form-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Inputs */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.form-group input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: var(--font-sans);
+  transition: all var(--transition-fast);
+}
+
+.form-group input:focus {
+  outline: none;
+  border: 1px solid #ff3344;
+  box-shadow: 0 0 8px rgba(255,51,68,0.5);
+  background: rgba(255, 51, 68, 0.05);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Error Message */
+.auth-error {
+  color: #ff3344;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  min-height: 20px;
+  margin-bottom: 15px;
+  text-shadow: 0 0 5px rgba(255, 51, 68, 0.5);
+  display: none;
+}
+
+/* Submit Button */
+.btn-auth {
+  width: 100%;
+  background-color: #ff3344;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: 10px;
+}
+
+.btn-auth:hover {
+  background-color: #e62e3d;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 51, 68, 0.4);
+}
+
+@media (max-width: 480px) {
+  .auth-form {
+    padding: 30px 20px 0 20px;
+  }
+}
