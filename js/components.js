@@ -46,7 +46,6 @@ const Components = {
         <div class="navbar-center">
           <a href="index.html" class="nav-link ${currentPath.includes('index.html') || currentPath === '/' ? 'active' : ''}">Ana Sayfa</a>
           <a href="trending.html" class="nav-link ${currentPath.includes('trending.html') ? 'active' : ''}">Trendler</a>
-          <a href="premium.html" class="nav-link ${currentPath.includes('premium.html') ? 'active' : ''}" style="color: var(--accent-primary); font-weight: 700; text-shadow: 0 0 10px rgba(255,51,68,0.5);">Premium</a>
           <a href="genres.html" class="nav-link ${currentPath.includes('genres.html') ? 'active' : ''}">Türler</a>
           <a href="mobile.html" class="nav-link ${currentPath.includes('mobile.html') ? 'active' : ''}">Mobil Uygulama</a>
         </div>
@@ -70,7 +69,6 @@ const Components = {
         <a href="search.html" class="nav-link">Keşfet & Ara</a>
         <a href="profile.html" class="nav-link">Profilim</a>
         <a href="trending.html" class="nav-link">Trendler</a>
-        <a href="premium.html" class="nav-link" style="color: var(--accent-primary); font-weight: 700; text-shadow: 0 0 10px rgba(255,51,68,0.5);">Premium</a>
         <a href="genres.html" class="nav-link">Türler</a>
         <a href="mobile.html" class="nav-link">Mobil Uygulama</a>
       </div>
