@@ -43,43 +43,12 @@ function saveUsers(users) {
   localStorage.setItem('aniverse_users', JSON.stringify(users));
 }
 
-// Handle Registration
+// Handle Registration (Disabled for Demo)
 function handleRegister(e) {
   e.preventDefault();
   
-  const usernameInput = document.getElementById('reg-username').value.trim();
-  const passwordInput = document.getElementById('reg-password').value;
-  const confirmPasswordInput = document.getElementById('reg-password-confirm').value;
-  
-  // Validation
-  if (passwordInput !== confirmPasswordInput) {
-    showError('register-error', 'Şifreler eşleşmiyor!');
-    return;
-  }
-  
-  const users = getUsers();
-  
-  // Check if username is taken (Case insensitive)
-  const isTaken = users.some(u => u.username.toLowerCase() === usernameInput.toLowerCase());
-  
-  if (isTaken) {
-    showError('register-error', 'Bu kullanıcı adı zaten alınmış!');
-    return;
-  }
-  
-  // Create User
-  const newUser = {
-    id: Date.now(),
-    username: usernameInput,
-    password: passwordInput, // Plain text ONLY because this is a client-side demo
-    createdAt: new Date().toISOString()
-  };
-  
-  users.push(newUser);
-  saveUsers(users);
-  
-  // Login directly
-  loginUser(newUser);
+  showError('register-error', 'Kayıtlar geçici olarak durdurulmuştur.');
+  Utils.showToast('Kayıt işlemleri demo sürecinde kapalıdır.', 'error');
 }
 
 // Handle Login
@@ -89,17 +58,26 @@ function handleLogin(e) {
   const usernameInput = document.getElementById('login-username').value.trim();
   const passwordInput = document.getElementById('login-password').value;
   
+  /* --- DEMO MODE: LocalStorage checks disabled ---
   const users = getUsers();
   
   const user = users.find(u => 
     u.username.toLowerCase() === usernameInput.toLowerCase() && 
     u.password === passwordInput
   );
+  ------------------------------------------------ */
   
-  if (user) {
-    loginUser(user);
+  // Admin-Only Login
+  if (usernameInput.toLowerCase() === 'admin' && passwordInput === 'admin123') {
+    const adminUser = {
+      id: 'admin-demo',
+      username: 'Admin',
+      initial: 'A',
+      role: 'admin'
+    };
+    loginUser(adminUser);
   } else {
-    showError('login-error', 'Kullanıcı adı veya şifre hatalı!');
+    showError('login-error', 'Yetkisiz Giriş: Demo sürecinde sadece yönetici hesabı aktif edilebilir.');
   }
 }
 
