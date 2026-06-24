@@ -3,7 +3,7 @@
    ====================================================== */
 
 .auth-page {
-  background: url('../assets/asanagi_banner.png') center/cover no-repeat fixed;
+  background: url('https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&q=80&w=1920&h=800') center/cover no-repeat fixed;
   position: relative;
   min-height: 100vh;
   z-index: 1;
