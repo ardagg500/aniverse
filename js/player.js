@@ -38,11 +38,11 @@ function renderPlayerPage(anime, episode) {
   
   const authOverlay = !isLoggedIn ? `
     <div class="auth-gate-overlay">
-      <div class="auth-gate-content">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary); margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        <h3 style="margin-bottom: 10px;">Bu içeriği izlemek için lütfen giriş yapın</h3>
-        <a href="auth.html" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">Giriş Yap</a>
-      </div>
+      <h3>Bu içeriği izlemek için lütfen giriş yapın</h3>
+      <a href="auth.html" class="auth-gate-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Giriş Yap
+      </a>
     </div>
   ` : '';
 

@@ -2,7 +2,7 @@
    AniVerse Video Player Styles
    ============================================ */
 
-/* ── Player Page Layout ── */
+/* â”€â”€ Player Page Layout â”€â”€ */
 .player-page {
   min-height: 100vh;
   background: #000;
@@ -21,7 +21,7 @@
   }
 }
 
-/* ── Video Container ── */
+/* â”€â”€ Video Container â”€â”€ */
 .player-container {
   position: relative;
   width: 100%;
@@ -45,7 +45,7 @@
   display: block;
 }
 
-/* ── Player Controls Overlay ── */
+/* â”€â”€ Player Controls Overlay â”€â”€ */
 .player-overlay {
   position: absolute;
   inset: 0;
@@ -297,7 +297,7 @@
   white-space: nowrap;
 }
 
-/* ── Quality Menu ── */
+/* â”€â”€ Quality Menu â”€â”€ */
 .quality-menu-wrap {
   position: relative;
 }
@@ -366,7 +366,7 @@
   opacity: 1;
 }
 
-/* ── Subtitle Display ── */
+/* â”€â”€ Subtitle Display â”€â”€ */
 .subtitle-display {
   position: absolute;
   bottom: 80px;
@@ -450,7 +450,7 @@
   cursor: pointer;
 }
 
-/* ── Episode Sidebar ── */
+/* â”€â”€ Episode Sidebar â”€â”€ */
 .episode-sidebar {
   background: var(--bg-secondary);
   border-left: 1px solid var(--glass-border);
@@ -569,7 +569,7 @@
   }
 }
 
-/* ── Next Episode Overlay ── */
+/* â”€â”€ Next Episode Overlay â”€â”€ */
 .next-episode-overlay {
   position: absolute;
   inset: 0;
@@ -652,7 +652,7 @@
   gap: var(--space-3);
 }
 
-/* ── Anime Info Section (below player) ── */
+/* â”€â”€ Anime Info Section (below player) â”€â”€ */
 .anime-info-section {
   background: var(--bg-primary);
   padding: var(--space-8) var(--space-6);
@@ -804,7 +804,7 @@
   }
 }
 
-/* ── Skip Indicator ── */
+/* â”€â”€ Skip Indicator â”€â”€ */
 .skip-indicator {
   position: absolute;
   top: 50%;
@@ -838,29 +838,47 @@
   font-size: var(--text-xs);
 }
 
- / *   A u t h   G a t e   O v e r l a y   * / 
- . a u t h - g a t e - o v e r l a y   { 
-     p o s i t i o n :   a b s o l u t e ; 
-     i n s e t :   0 ; 
-     b a c k g r o u n d :   r g b a ( 0 ,   0 ,   0 ,   0 . 8 5 ) ; 
-     b a c k d r o p - f i l t e r :   b l u r ( 8 p x ) ; 
-     d i s p l a y :   f l e x ; 
-     a l i g n - i t e m s :   c e n t e r ; 
-     j u s t i f y - c o n t e n t :   c e n t e r ; 
-     z - i n d e x :   3 0 ; 
-     t e x t - a l i g n :   c e n t e r ; 
- } 
- . a u t h - g a t e - c o n t e n t   { 
-     b a c k g r o u n d :   v a r ( - - b g - c a r d ) ; 
-     p a d d i n g :   4 0 p x ; 
-     b o r d e r - r a d i u s :   v a r ( - - r a d i u s - l g ) ; 
-     b o x - s h a d o w :   0   1 0 p x   4 0 p x   r g b a ( 0 , 0 , 0 , 0 . 5 ) ; 
-     b o r d e r :   1 p x   s o l i d   r g b a ( 2 5 5 , 5 1 , 6 8 , 0 . 2 ) ; 
-     m a x - w i d t h :   9 0 % ; 
- } 
- . a u t h - g a t e - c o n t e n t   h 3   { 
-     f o n t - f a m i l y :   v a r ( - - f o n t - d i s p l a y ) ; 
-     f o n t - s i z e :   1 . 5 r e m ; 
-     c o l o r :   w h i t e ; 
- }  
- 
+/* ── Auth Gate Overlay ── */
+.auth-gate-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  text-align: center;
+}
+
+.auth-gate-overlay h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.auth-gate-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-gradient);
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(var(--accent-primary-rgb), 0.4);
+  transition: all var(--transition-fast);
+}
+
+.auth-gate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--accent-primary-rgb), 0.6);
+}
