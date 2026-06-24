@@ -48,6 +48,7 @@ const Components = {
           <a href="trending.html" class="nav-link ${currentPath.includes('trending.html') ? 'active' : ''}">Trendler</a>
           <a href="genres.html" class="nav-link ${currentPath.includes('genres.html') ? 'active' : ''}">Türler</a>
           <a href="mobile.html" class="nav-link ${currentPath.includes('mobile.html') ? 'active' : ''}">Mobil Uygulama</a>
+          ${localStorage.getItem('userRole') === 'admin' ? `<a href="admin.html" class="nav-link" style="color: #ff3344; text-shadow: 0 0 8px rgba(255,51,68,0.6); font-weight: 700;">Admin Paneli</a>` : ''}
         </div>
         
         <div class="navbar-right">

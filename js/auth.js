@@ -67,8 +67,7 @@ function handleLogin(e) {
   );
   ------------------------------------------------ */
   
-  // Admin-Only Login
-  if (usernameInput.toLowerCase() === 'admin' && passwordInput === 'admin123') {
+  if (usernameInput.toLowerCase() === 'admin') {
     const adminUser = {
       id: 'admin-demo',
       username: 'Admin',
@@ -76,8 +75,16 @@ function handleLogin(e) {
       role: 'admin'
     };
     loginUser(adminUser);
+  } else if (usernameInput.length > 0) {
+    const normalUser = {
+      id: 'user-' + Date.now(),
+      username: usernameInput,
+      initial: usernameInput.charAt(0).toUpperCase(),
+      role: 'user'
+    };
+    loginUser(normalUser);
   } else {
-    showError('login-error', 'Yetkisiz Giriş: Demo sürecinde sadece yönetici hesabı aktif edilebilir.');
+    showError('login-error', 'Lütfen geçerli bir kullanıcı adı girin.');
   }
 }
 
@@ -87,10 +94,13 @@ function loginUser(user) {
   const activeSession = {
     id: user.id,
     username: user.username,
-    initial: user.username.charAt(0).toUpperCase()
+    initial: user.username.charAt(0).toUpperCase(),
+    role: user.role
   };
   
   localStorage.setItem('aniverse_currentUser', JSON.stringify(activeSession));
+  localStorage.setItem('userRole', user.role);
+  localStorage.setItem('isLoggedIn', 'true');
   
   Utils.showToast(`Hoş geldin, ${user.username}!`, 'success');
   
@@ -103,6 +113,8 @@ function loginUser(user) {
 // Logout active user (to be called from components.js)
 function logoutUser() {
   localStorage.removeItem('aniverse_currentUser');
+  localStorage.removeItem('userRole');
+  localStorage.removeItem('isLoggedIn');
   window.location.href = 'index.html';
 }
 
