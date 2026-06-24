@@ -33,6 +33,19 @@ function renderPlayerPage(anime, episode) {
   // Update Title
   document.title = `${anime.title} - Bölüm ${episode.number} | AniVerse`;
   
+  // Check Auth
+  const isLoggedIn = !!localStorage.getItem('aniverse_currentUser');
+  
+  const authOverlay = !isLoggedIn ? `
+    <div class="auth-gate-overlay">
+      <div class="auth-gate-content">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary); margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <h3 style="margin-bottom: 10px;">Bu içeriği izlemek için lütfen giriş yapın</h3>
+        <a href="auth.html" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">Giriş Yap</a>
+      </div>
+    </div>
+  ` : '';
+
   const main = document.querySelector('main');
   
   main.innerHTML = `
@@ -40,12 +53,19 @@ function renderPlayerPage(anime, episode) {
       <!-- Player Area -->
       <div class="player-area">
         <div class="player-container" id="video-container">
-          <!-- Real video would go here, using a placeholder for demo -->
-          ${episode.embedUrl ? `
-            <iframe src="${episode.embedUrl}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:20;"></iframe>
-          ` : `
-          <video id="video-player" src="videos/şimdi_böyle_bir_sitem_var_bu_s.mp4" poster="${anime.banner || anime.image}"></video>
+          ${authOverlay}
+          ${isLoggedIn ? (
+            episode.embedUrl ? `
+              <iframe src="${episode.embedUrl}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:20;"></iframe>
+            ` : `
+            <video id="video-player" src="videos/şimdi_böyle_bir_sitem_var_bu_s.mp4" poster="${anime.banner || anime.image}"></video>
+            `
+          ) : `
+            <!-- Sadece poster göster, video yükleme -->
+            <img src="${anime.banner || anime.image}" style="width: 100%; height: 100%; object-fit: cover;" alt="Locked">
+          `}
           
+          ${isLoggedIn && !episode.embedUrl ? `
           <!-- Subtitle Display -->
           <div class="subtitle-display">
             <div class="subtitle-text" id="subtitle-text" style="display: none;">[Altyazı burada görüntülenecek]</div>
@@ -175,7 +195,7 @@ function renderPlayerPage(anime, episode) {
               </div>
             </div>
           </div>
-          `}
+          ` : ''}
         </div>
         
         <!-- Info Section -->
