@@ -41,6 +41,9 @@ function renderPlayerPage(anime, episode) {
       <div class="player-area">
         <div class="player-container" id="video-container">
           <!-- Real video would go here, using a placeholder for demo -->
+          ${episode.embedUrl ? `
+            <iframe src="${episode.embedUrl}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:20;"></iframe>
+          ` : `
           <video id="video-player" src="videos/şimdi_böyle_bir_sitem_var_bu_s.mp4" poster="${anime.banner || anime.image}"></video>
           
           <!-- Subtitle Display -->
@@ -172,6 +175,7 @@ function renderPlayerPage(anime, episode) {
               </div>
             </div>
           </div>
+          `}
         </div>
         
         <!-- Info Section -->
@@ -262,6 +266,7 @@ function renderEpisodeList(anime, currentEpNumber) {
 
 function initPlayer(anime, currentEpisode) {
   const video = document.getElementById('video-player');
+  if (!video) return; // Ignore custom player initialization if iframe is used
   const container = document.getElementById('video-container');
   const controls = document.getElementById('player-controls');
   
