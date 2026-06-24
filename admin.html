@@ -150,19 +150,19 @@
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">Toplam Kullanıcı</div>
-        <div class="stat-value">12,482</div>
+        <div class="stat-value" id="stat-total-users">Yükleniyor...</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Aktif Kullanıcılar</div>
-        <div class="stat-value" style="color: #10b981;">1,843</div>
+        <div class="stat-value" id="stat-active-users" style="color: #10b981;">...</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Premium Aboneler</div>
-        <div class="stat-value" style="color: #ff3344;">4,291</div>
+        <div class="stat-value" id="stat-premium-users" style="color: #ff3344;">...</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Şu An İzleyenler</div>
-        <div class="stat-value">856</div>
+        <div class="stat-value" id="stat-watching-users">...</div>
       </div>
     </div>
 
@@ -191,21 +191,56 @@
   <script src="js/components.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       // Inject Header and Footer
       Components.injectLayout();
 
-      const mockUsers = [
-        { username: "arda_dev", status: "Aktif", subType: "Premium", watching: "Neon Echoes - Bölüm 1", regDate: "12.04.2026" },
-        { username: "animeci_girl", status: "Aktif", subType: "Ücretsiz", watching: "Sınıfımın En Güzel İkinci Kızıyla Arkadaş Oldum - Bölüm 1", regDate: "20.05.2026" },
-        { username: "eren_99", status: "Çevrimdışı", subType: "Premium", watching: "Hiçbiri (Son İzleme: Attack on Titan)", regDate: "01.01.2026" },
-        { username: "siber_samuray", status: "Aktif", subType: "Premium", watching: "Cyber Neon - Bölüm 3", regDate: "23.06.2026" },
-        { username: "manga_kurdu", status: "Çevrimdışı", subType: "Ücretsiz", watching: "Hiçbiri", regDate: "15.02.2026" }
-      ];
+      try {
+        // Backend API'sine istek atıyoruz (Gerçek URL ile değiştirin)
+        const response = await fetch('/api/admin/dashboard');
+        
+        if (!response.ok) throw new Error('API Hatası');
+        
+        const data = await response.json();
+        
+        // İstatistikleri Güncelle
+        document.getElementById('stat-total-users').textContent = data.totalUsers.toLocaleString();
+        document.getElementById('stat-active-users').textContent = data.activeUsers.toLocaleString();
+        document.getElementById('stat-premium-users').textContent = data.premiumUsers.toLocaleString();
+        document.getElementById('stat-watching-users').textContent = data.watchingUsers.toLocaleString();
 
+        // Tabloyu Güncelle
+        renderUsersTable(data.users);
+
+      } catch (error) {
+        console.warn('Backend API ulaşılamadı. Test verileri gösteriliyor.', error);
+        // Fallback: Test verisi (Backend yoksa Vercel'de sayfa kırılmasın diye)
+        const mockData = {
+          totalUsers: 145,
+          activeUsers: 12,
+          premiumUsers: 45,
+          watchingUsers: 8,
+          users: [
+            { username: "arda_dev", status: "Aktif", subType: "Premium", watching: "Neon Echoes - Bölüm 1", regDate: "12.04.2026" },
+            { username: "animeci_girl", status: "Aktif", subType: "Ücretsiz", watching: "Sınıfımın En Güzel İkinci Kızıyla Arkadaş Oldum - Bölüm 1", regDate: "20.05.2026" },
+            { username: "eren_99", status: "Çevrimdışı", subType: "Premium", watching: "Hiçbiri (Son İzleme: Attack on Titan)", regDate: "01.01.2026" }
+          ]
+        };
+        
+        document.getElementById('stat-total-users').textContent = mockData.totalUsers;
+        document.getElementById('stat-active-users').textContent = mockData.activeUsers;
+        document.getElementById('stat-premium-users').textContent = mockData.premiumUsers;
+        document.getElementById('stat-watching-users').textContent = mockData.watchingUsers;
+        
+        renderUsersTable(mockData.users);
+      }
+    });
+
+    function renderUsersTable(users) {
       const tbody = document.getElementById('user-table-body');
+      tbody.innerHTML = ''; // Temizle
       
-      mockUsers.forEach(user => {
+      users.forEach(user => {
         const isOnline = user.status === 'Aktif';
         const isPremium = user.subType === 'Premium';
         
@@ -230,7 +265,7 @@
         \`;
         tbody.appendChild(tr);
       });
-    });
+    }
   </script>
 </body>
 </html>
