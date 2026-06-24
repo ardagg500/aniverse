@@ -230,6 +230,32 @@ const mockData = {
       isNew: true,
       quality: "1080p",
       episodes: []
+    },
+    {
+      id: 111,
+      title: "Sınıfımın En Güzel İkinci Kızıyla Arkadaş Oldum",
+      titleJp: "I Made Friends with the Second Prettiest Girl in My Class",
+      image: "assets/asanagi_poster.png",
+      banner: "assets/asanagi_banner.png",
+      description: "Maehara Maki yeni okuluna ilk girişini bombalar ama bir şekilde ona yardım etmek için geri döner.",
+      genres: ["Lise", "Romantik", "Aksiyon"],
+      rating: 8.5,
+      year: 2026,
+      season: "Bahar",
+      status: "Devam Ediyor",
+      studio: "Bilinmiyor",
+      totalEpisodes: 12,
+      popularity: 85,
+      isNew: true,
+      quality: "1080p",
+      episodes: [
+        { 
+          number: 1, 
+          title: "1. Bölüm", 
+          duration: "24:00", 
+          embedUrl: "https://tau-video.xyz/embed/69d5763298be3e47efffd7fd?vid=749135" 
+        }
+      ]
     }
   ],
 
