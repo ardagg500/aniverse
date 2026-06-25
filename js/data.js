@@ -69,8 +69,25 @@ const mockData = {
 function getAnimes() {
   try {
     const stored = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
-    // Eklenen yeni animeleri en başa koyuyoruz ki ana sayfada ve listelerde hemen en üstte gözüksün
-    return [...stored, ...mockData.animes];
+    const deletedAnimeIds = JSON.parse(localStorage.getItem('admin_deleted_animes') || '[]');
+    const deletedEps = JSON.parse(localStorage.getItem('admin_deleted_episodes') || '[]');
+    const adminAddedEps = JSON.parse(localStorage.getItem('admin_added_episodes') || '[]');
+
+    let combined = [...stored, ...mockData.animes];
+    
+    // Silinmiş animeleri çıkar
+    combined = combined.filter(a => !deletedAnimeIds.includes(a.id) && !deletedAnimeIds.includes(String(a.id)));
+
+    // Bölümleri birleştir ve silinmiş bölümleri çıkar
+    return combined.map(anime => {
+      const extraEps = adminAddedEps.filter(e => String(e.animeId) === String(anime.id));
+      const baseEps = anime.episodes || [];
+      let allEps = [...baseEps, ...extraEps];
+      
+      allEps = allEps.filter(ep => !deletedEps.some(del => String(del.animeId) === String(anime.id) && Number(del.number) === Number(ep.number)));
+      
+      return { ...anime, episodes: allEps, totalEpisodes: allEps.length > 0 ? allEps.length : anime.totalEpisodes };
+    });
   } catch {
     return mockData.animes;
   }
