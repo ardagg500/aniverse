@@ -19,21 +19,24 @@ function renderHero() {
   if (!heroContainer) return;
   heroContainer.className = 'hero-accordion-container';
   let html = '';
-  HERO_SLIDES.forEach((slide) => {
-    const anime = Utils.getAnimeById(slide.animeId);
+  
+  const validSlides = HERO_SLIDES.filter(s => Utils.getAnimeById(s.animeId));
+  const displayList = validSlides.length > 0 ? validSlides.map(s => Utils.getAnimeById(s.animeId)) : ANIME_DATA.slice(0, 3);
+
+  displayList.forEach((anime) => {
     if (!anime) return;
     html += `
       <div class="hero-panel" data-id="${anime.id}" onclick="window.location.href='watch.html?id=${anime.id}'">
         <img src="${anime.banner || anime.image}" alt="${anime.title}" class="hero-panel-bg">
         <div class="hero-panel-gradient"></div>
-        <div class="hero-panel-badge-sm">${slide.tagline || anime.genres[0]}</div>
+        <div class="hero-panel-badge-sm">${anime.genres && anime.genres.length > 0 ? anime.genres[0] : 'Anime'}</div>
         <div class="hero-panel-content">
           <div class="hero-badges">
-            <span class="badge badge-primary">${anime.season}</span>
-            <span class="badge badge-warning">★ ${Utils.formatRating(anime.rating)}</span>
+            <span class="badge badge-primary">${anime.season || 'Yeni'}</span>
+            <span class="badge badge-warning">★ ${Utils.formatRating(anime.rating || 8.5)}</span>
           </div>
           <h2 class="hero-panel-title">${anime.title}</h2>
-          <p class="hero-panel-desc">${anime.description}</p>
+          <p class="hero-panel-desc">${anime.description || ''}</p>
           <button class="btn btn-primary mt-4" style="pointer-events: auto; padding: 10px 20px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Hemen İzle
           </button>
