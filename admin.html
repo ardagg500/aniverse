@@ -186,11 +186,29 @@
             <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Kapak Fotoğrafı (URL)</label>
             <input type="url" id="anime-cover-input" required placeholder="https://images.unsplash.com/..." style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
           </div>
-          <div class="form-group" style="margin-bottom: 24px;">
+          <div class="form-group" style="margin-bottom: 18px;">
             <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Toplam Sezon Sayısı</label>
             <input type="number" id="anime-seasons-input" min="1" max="20" value="1" required style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
           </div>
-          <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-weight:700; border-radius:10px; background:#ff3344; color:white; border:none; cursor:pointer; box-shadow: 0 4px 15px rgba(255,51,68,0.3); transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Animeyi Kaydet</button>
+
+          <!-- DİREKT SEZON BÖLÜMLERİ GİRİŞİ (GİRDİKÇE ARTAN) -->
+          <div class="form-group" style="margin-bottom: 24px; background:rgba(0,0,0,0.25); padding:16px; border-radius:12px; border:1px solid rgba(255,51,68,0.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <label style="color:#ff3344; font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:6px;">
+                <span>🎬 Sezon Bölümleri (Embed Video Linkleri)</span>
+              </label>
+              <button type="button" onclick="addNextEpisodeInputRow()" style="background:#ff3344; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">+ 2. Bölümü Ekle</button>
+            </div>
+            
+            <div id="dynamic-episode-list" style="display:flex; flex-direction:column; gap:10px;">
+              <div class="dynamic-ep-row" style="display:flex; gap:8px; align-items:center;">
+                <span class="ep-num-badge" style="background:rgba(255,51,68,0.15); color:#ff3344; border:1px solid rgba(255,51,68,0.3); padding:10px 14px; border-radius:8px; font-weight:700; font-size:0.85rem; min-width:85px; text-align:center;">1. Bölüm</span>
+                <input type="text" class="anime-new-ep-input" placeholder="https://tau-video.xyz/... veya <iframe src='...'>" style="flex:1; padding:10px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; outline:none; font-size:0.85rem;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+              </div>
+            </div>
+            <p style="color:var(--text-tertiary); font-size:0.75rem; margin-top:10px; margin-bottom:0;">💡 Alt alta eklediğin linkler otomatik olarak 1. Bölüm, 2. Bölüm sırasıyla animeye tanımlanır.</p>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-weight:700; border-radius:10px; background:#ff3344; color:white; border:none; cursor:pointer; box-shadow: 0 4px 15px rgba(255,51,68,0.3); transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Animeyi ve Bölümlerini Kaydet</button>
         </form>
       </div>
 
@@ -301,6 +319,33 @@
       });
     }
 
+    function addNextEpisodeInputRow() {
+      const container = document.getElementById('dynamic-episode-list');
+      if (!container) return;
+      const nextNum = container.children.length + 1;
+      
+      const row = document.createElement('div');
+      row.className = 'dynamic-ep-row';
+      row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+      
+      row.innerHTML = `
+        <span class="ep-num-badge" style="background:rgba(255,51,68,0.15); color:#ff3344; border:1px solid rgba(255,51,68,0.3); padding:10px 14px; border-radius:8px; font-weight:700; font-size:0.85rem; min-width:85px; text-align:center;">${nextNum}. Bölüm</span>
+        <input type="text" class="anime-new-ep-input" placeholder="https://tau-video.xyz/... veya <iframe src='...'>" style="flex:1; padding:10px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; outline:none; font-size:0.85rem;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+        <button type="button" onclick="this.parentElement.remove(); reindexDynamicEpisodes();" style="background:rgba(255,255,255,0.05); color:#ef4444; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px 12px; cursor:pointer; font-weight:700;">Sil</button>
+      `;
+      container.appendChild(row);
+      const inp = row.querySelector('input');
+      if (inp) inp.focus();
+    }
+
+    function reindexDynamicEpisodes() {
+      const rows = document.querySelectorAll('#dynamic-episode-list .dynamic-ep-row');
+      rows.forEach((r, idx) => {
+        const badge = r.querySelector('.ep-num-badge');
+        if (badge) badge.textContent = `${idx + 1}. Bölüm`;
+      });
+    }
+
     function handleAnimeSelectChange() {
       const animeId = document.getElementById('episode-anime-select').value;
       const seasonSelect = document.getElementById('episode-season-select');
@@ -322,6 +367,12 @@
         seasonSelect.appendChild(opt);
       }
       seasonSelect.disabled = false;
+
+      // Otomatik sıradaki bölüm numarasını hesapla (Örn: 1 bölüm varsa otomatik 2 yaz)
+      const storedEps = JSON.parse(localStorage.getItem('admin_added_episodes') || '[]');
+      const existingCount = storedEps.filter(e => String(e.animeId) === String(animeId)).length + (selectedAnime && selectedAnime.episodes ? selectedAnime.episodes.length : 0);
+      const numInput = document.getElementById('episode-num-input');
+      if (numInput) numInput.value = existingCount + 1;
     }
 
     function handleAddAnime(e) {
@@ -330,19 +381,64 @@
       const cover = document.getElementById('anime-cover-input').value;
       const seasons = parseInt(document.getElementById('anime-seasons-input').value) || 1;
 
+      const epInputs = document.querySelectorAll('.anime-new-ep-input');
+      const episodes = [];
+      epInputs.forEach((inp, idx) => {
+        const val = inp.value.trim();
+        if (val) {
+          let cleanUrl = val;
+          if (val.includes('<iframe')) {
+            const m = val.match(/src=["'](.*?)["']/);
+            if (m && m[1]) cleanUrl = m[1];
+          }
+          episodes.push({
+            number: idx + 1,
+            title: `${idx + 1}. Bölüm`,
+            duration: "24:00",
+            embedUrl: cleanUrl
+          });
+        }
+      });
+
+      const numId = Date.now();
       const newAnime = {
-        id: 'custom_' + Date.now(),
+        id: numId,
         title,
-        cover,
-        seasons
+        titleJp: title,
+        image: cover,
+        banner: cover,
+        description: `${title} efsanesi AniVerse platformunda.`,
+        genres: ["Aksiyon", "Macera", "Fantastik"],
+        rating: 8.8,
+        year: new Date().getFullYear(),
+        season: "Bahar",
+        status: "Devam Ediyor",
+        studio: "AniVerse Studio",
+        totalEpisodes: episodes.length > 0 ? episodes.length : 12,
+        popularity: 92,
+        isNew: true,
+        quality: "1080p",
+        seasons,
+        episodes
       };
 
       const stored = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
       stored.push(newAnime);
       localStorage.setItem('admin_added_animes', JSON.stringify(stored));
       
-      alert(`"${title}" başarıyla sisteme eklendi!`);
+      alert(`"${title}" (${episodes.length} Bölüm ile birlikte) başarıyla sisteme eklendi!`);
       document.getElementById('add-anime-form').reset();
+      
+      // Reset episode list to just 1 row
+      const listContainer = document.getElementById('dynamic-episode-list');
+      if (listContainer) {
+        listContainer.innerHTML = `
+          <div class="dynamic-ep-row" style="display:flex; gap:8px; align-items:center;">
+            <span class="ep-num-badge" style="background:rgba(255,51,68,0.15); color:#ff3344; border:1px solid rgba(255,51,68,0.3); padding:10px 14px; border-radius:8px; font-weight:700; font-size:0.85rem; min-width:85px; text-align:center;">1. Bölüm</span>
+            <input type="text" class="anime-new-ep-input" placeholder="https://tau-video.xyz/... veya <iframe src='...'>" style="flex:1; padding:10px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white; outline:none; font-size:0.85rem;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+        `;
+      }
       initAnimeDropdown();
     }
 
@@ -360,11 +456,11 @@
       storedEps.push({ animeId, animeName, season, episodeNum, src, date: new Date().toISOString() });
       localStorage.setItem('admin_added_episodes', JSON.stringify(storedEps));
 
-      alert(`Yeni Bölüm başarıyla yayınlandı:\n${animeName} - S${season} B${episodeNum}`);
+      const nextNum = parseInt(episodeNum) + 1;
+      document.getElementById('episode-src-input').value = '';
+      document.getElementById('episode-num-input').value = nextNum;
 
-      document.getElementById('add-episode-form').reset();
-      document.getElementById('episode-season-select').disabled = true;
-      document.getElementById('episode-season-select').innerHTML = '<option value="">Önce Anime Seçin</option>';
+      alert(`✅ Bölüm yayınlandı: ${animeName} - S${season} B${episodeNum}\n\n➡️ Kutucuk sıradaki bölüm (${nextNum}. Bölüm) için otomatik artırıldı!`);
     }
   </script>
 </body>
