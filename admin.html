@@ -242,15 +242,20 @@
       // 1. Önce C# Veritabanından (API) gerçek sayıları çekmeyi dener
       const endpoints = ['/api/admin/dashboard', '/Admin/GetStats', '/Admin/GetDashboardStats', '/Admin/stats', '/api/Admin/dashboard'];
       let fetchedData = null;
+      
+      // Sadece gerçek bir C# sunucusunda çalışırken probe et (dosyadan çift tıklama file:// veya statik önizlemede konsolu kırmızı hatalarla boğma)
+      const isLiveBackend = window.location.protocol.includes('http') && !window.location.hostname.includes('github') && !window.location.hostname.includes('vercel');
 
-      for (const ep of endpoints) {
-        try {
-          const response = await fetch(ep);
-          if (response.ok) {
-            fetchedData = await response.json();
-            break;
-          }
-        } catch (err) {}
+      if (isLiveBackend) {
+        for (const ep of endpoints) {
+          try {
+            const response = await fetch(ep);
+            if (response.ok) {
+              fetchedData = await response.json();
+              break;
+            }
+          } catch (err) {}
+        }
       }
 
       if (fetchedData) {
