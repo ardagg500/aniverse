@@ -55,6 +55,25 @@
       <div class="horizontal-scroll-container" id="popular-weekly">
         <!-- Injected by app.js -->
       </div>
+    <!-- Haftalık Yayın Takvimi (Admin Kontrollü) -->
+    <section class="section container" id="weekly-schedule-section">
+      <div class="section-header reveal">
+        <h2 class="section-title">
+          <span class="icon text-accent">📅</span> Haftalık Yayın Takvimi
+        </h2>
+      </div>
+      <div class="schedule-days-bar" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px; margin-bottom:20px;">
+        <button class="btn btn-secondary schedule-tab active" data-day="Pazartesi" onclick="switchScheduleDay('Pazartesi')" style="min-width:110px; font-weight:700;">Pazartesi</button>
+        <button class="btn btn-secondary schedule-tab" data-day="Salı" onclick="switchScheduleDay('Salı')" style="min-width:90px; font-weight:700;">Salı</button>
+        <button class="btn btn-secondary schedule-tab" data-day="Çarşamba" onclick="switchScheduleDay('Çarşamba')" style="min-width:110px; font-weight:700;">Çarşamba</button>
+        <button class="btn btn-secondary schedule-tab" data-day="Perşembe" onclick="switchScheduleDay('Perşembe')" style="min-width:110px; font-weight:700;">Perşembe</button>
+        <button class="btn btn-secondary schedule-tab" data-day="Cuma" onclick="switchScheduleDay('Cuma')" style="min-width:90px; font-weight:700;">Cuma</button>
+        <button class="btn btn-secondary schedule-tab" data-day="Cumartesi" onclick="switchScheduleDay('Cumartesi')" style="min-width:110px; font-weight:700;">Cumartesi</button>
+        <button class="btn btn-secondary schedule-tab" data-day="Pazar" onclick="switchScheduleDay('Pazar')" style="min-width:90px; font-weight:700;">Pazar</button>
+      </div>
+      <div id="schedule-day-content" class="grid grid-auto-fill" style="min-height:120px;">
+        <!-- Injected by app.js -->
+      </div>
     </section>
 
     <!-- Son Eklenen Bölümler (Grid) -->

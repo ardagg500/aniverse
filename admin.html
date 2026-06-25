@@ -245,6 +245,48 @@
         </form>
       </div>
 
+      <!-- 3. YAYIN TAKVİMİ DÜZENLEME FORMU -->
+      <div class="table-container" style="margin-bottom: 0;">
+        <h2 class="table-header" style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem;">
+          <span style="color:#eab308">📅</span> Yayın Takvimi Düzenle
+        </h2>
+        <form id="add-schedule-form" onsubmit="handleAddSchedule(event)">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:18px;">
+            <div class="form-group">
+              <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Yayın Günü</label>
+              <select id="schedule-day-select" required style="width:100%; padding:12px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;">
+                <option value="Pazartesi">Pazartesi</option>
+                <option value="Salı">Salı</option>
+                <option value="Çarşamba">Çarşamba</option>
+                <option value="Perşembe">Perşembe</option>
+                <option value="Cuma">Cuma</option>
+                <option value="Cumartesi">Cumartesi</option>
+                <option value="Pazar">Pazar</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Yayın Saati</label>
+              <input type="time" id="schedule-time-input" value="20:00" required style="width:100%; padding:12px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Anime Seçimi</label>
+            <select id="schedule-anime-select" required style="width:100%; padding:12px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;">
+              <option value="">Anime Seçin...</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-weight:700; border-radius:10px; background:#eab308; color:#000; border:none; cursor:pointer; box-shadow: 0 4px 15px rgba(234,179,8,0.25);">Takvime Kaydet</button>
+        </form>
+
+        <!-- AKTİF TAKVİM LİSTESİ -->
+        <div style="margin-top:24px; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;">
+          <h3 style="font-size:0.95rem; color:var(--text-secondary); margin-bottom:10px;">Planlanmış Yayınlar</h3>
+          <div id="active-schedule-list" style="display:flex; flex-direction:column; gap:8px; max-height:180px; overflow-y:auto;">
+            <!-- JS populates -->
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -309,14 +351,25 @@
       availableAnimes = [...defaultAnimes.map(a => ({ id: a.id, title: a.title, seasons: a.seasons || 2 })), ...storedAnimes];
       
       const select = document.getElementById('episode-anime-select');
-      select.innerHTML = '<option value="">Anime Seçin...</option>';
+      const schSelect = document.getElementById('schedule-anime-select');
+      if (select) select.innerHTML = '<option value="">Anime Seçin...</option>';
+      if (schSelect) schSelect.innerHTML = '<option value="">Anime Seçin...</option>';
       
       availableAnimes.forEach(anime => {
-        const opt = document.createElement('option');
-        opt.value = anime.id;
-        opt.textContent = `${anime.title} (${anime.seasons} Sezon)`;
-        select.appendChild(opt);
+        if (select) {
+          const opt = document.createElement('option');
+          opt.value = anime.id;
+          opt.textContent = `${anime.title} (${anime.seasons} Sezon)`;
+          select.appendChild(opt);
+        }
+        if (schSelect) {
+          const schOpt = document.createElement('option');
+          schOpt.value = anime.id;
+          schOpt.textContent = anime.title;
+          schSelect.appendChild(schOpt);
+        }
       });
+      if (typeof renderActiveScheduleList === 'function') renderActiveScheduleList();
     }
 
     function addNextEpisodeInputRow() {
@@ -462,6 +515,61 @@
 
       alert(`✅ Bölüm yayınlandı: ${animeName} - S${season} B${episodeNum}\n\n➡️ Kutucuk sıradaki bölüm (${nextNum}. Bölüm) için otomatik artırıldı!`);
     }
+
+    // --- SCHEDULE MANAGEMENT ---
+    function renderActiveScheduleList() {
+      const container = document.getElementById('active-schedule-list');
+      if (!container) return;
+      const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null') || [
+        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
+      ];
+
+      if (stored.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-tertiary); font-size:0.85rem;">Henüz takvime bir yayın eklenmemiş.</p>';
+        return;
+      }
+
+      let html = '';
+      stored.forEach((item, idx) => {
+        const anime = availableAnimes.find(a => String(a.id) === String(item.animeId));
+        const name = anime ? anime.title : 'Anime';
+        html += `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+            <div style="font-size:0.85rem; color:white;">
+              <span style="color:#eab308; font-weight:700;">[${item.day} - ${item.time}]</span> ${name}
+            </div>
+            <button type="button" onclick="removeScheduleItem(${idx})" style="background:rgba(239,68,68,0.2); color:#ef4444; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.75rem;">Sil</button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function handleAddSchedule(e) {
+      e.preventDefault();
+      const day = document.getElementById('schedule-day-select').value;
+      const animeId = document.getElementById('schedule-anime-select').value;
+      const time = document.getElementById('schedule-time-input').value;
+
+      const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null') || [
+        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
+      ];
+
+      stored.push({ id: 'sch_' + Date.now(), day, animeId: parseInt(animeId) || animeId, time });
+      localStorage.setItem('admin_broadcast_schedule', JSON.stringify(stored));
+      alert('✅ Anime yayın takvime başarıyla eklendi!');
+      renderActiveScheduleList();
+    }
+
+    function removeScheduleItem(idx) {
+      const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null') || [
+        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
+      ];
+      stored.splice(idx, 1);
+      localStorage.setItem('admin_broadcast_schedule', JSON.stringify(stored));
+      renderActiveScheduleList();
+    }
+    window.removeScheduleItem = removeScheduleItem;
   </script>
 </body>
 </html>

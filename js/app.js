@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHero();
   renderContinueWatching();
   renderPopularWeekly();
+  renderWeeklySchedule('Pazartesi');
+  setTimeout(() => switchScheduleDay('Pazartesi'), 100);
   renderNewEpisodes();
 });
 
@@ -117,6 +119,61 @@ function renderNewEpisodes() {
   Utils.initLazyLoading();
   Utils.initScrollReveal();
 }
+
+// 🌟 Haftalık Yayın Takvimi Yönetimi 🌟
+function getBroadcastSchedule() {
+  const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null');
+  if (stored !== null) return stored;
+  return [
+    { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
+  ];
+}
+
+function renderWeeklySchedule(day = 'Pazartesi') {
+  const container = document.getElementById('schedule-day-content');
+  if (!container) return;
+
+  const schedule = getBroadcastSchedule();
+  const todayItems = schedule.filter(s => s.day === day);
+
+  if (todayItems.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-tertiary); font-size:0.9rem; grid-column: 1/-1; text-align:center; padding:30px 0; background:rgba(255,255,255,0.02); border-radius:12px;">Bu gün için planlanmış bir anime yayını bulunmuyor. (Admin panelinden eklenebilir).</p>`;
+    return;
+  }
+
+  let html = '';
+  todayItems.forEach(item => {
+    const anime = Utils.getAnimeById(item.animeId);
+    if (!anime) return;
+    html += `
+      <div class="reveal-scale">
+        ${Components.renderAnimeCard(anime, `⏰ ${item.time}`)}
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  Utils.initLazyLoading();
+}
+
+function switchScheduleDay(day) {
+  const tabs = document.querySelectorAll('.schedule-tab');
+  tabs.forEach(t => {
+    if (t.dataset.day === day) {
+      t.classList.add('active');
+      t.style.background = '#ff3344';
+      t.style.color = '#fff';
+      t.style.borderColor = '#ff3344';
+    } else {
+      t.classList.remove('active');
+      t.style.background = 'rgba(255,255,255,0.04)';
+      t.style.color = 'var(--text-secondary)';
+      t.style.borderColor = 'rgba(255,255,255,0.08)';
+    }
+  });
+  renderWeeklySchedule(day);
+}
+window.switchScheduleDay = switchScheduleDay;
 
 // Setup Watchlist Buttons globally
 function setupWatchlistButtons(container = document) {
