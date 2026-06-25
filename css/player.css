@@ -13,6 +13,7 @@
   display: grid;
   grid-template-columns: 1fr 360px;
   min-height: calc(100vh - var(--nav-height));
+  margin-top: var(--nav-height);
 }
 
 @media (max-width: 1024px) {
