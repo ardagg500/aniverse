@@ -239,20 +239,35 @@
       // Inject Header and Footer
       Components.injectLayout();
 
-      try {
-        // Doğrudan veritabanı API'sine bağlanarak sayıları çekiyoruz (_context.Users.Count())
-        const response = await fetch('/api/admin/dashboard');
-        if (!response.ok) throw new Error('API Hatası');
-        const data = await response.json();
+      // Farklı ASP.NET Core isimlendirme standartlarını dener
+      const endpoints = ['/api/admin/dashboard', '/Admin/GetStats', '/Admin/GetDashboardStats', '/Admin/stats', '/api/Admin/dashboard'];
+      let fetchedData = null;
+
+      for (const ep of endpoints) {
+        try {
+          const response = await fetch(ep);
+          if (response.ok) {
+            fetchedData = await response.json();
+            console.log('Veritabanı bilgileri başarıyla alındı:', ep, fetchedData);
+            break;
+          }
+        } catch (err) {
+          // Sonraki rotayı dene
+        }
+      }
+
+      if (fetchedData) {
+        const total = fetchedData.totalUsers !== undefined ? fetchedData.totalUsers : (fetchedData.TotalUsers !== undefined ? fetchedData.TotalUsers : (fetchedData.count || 0));
+        const premium = fetchedData.premiumUsers !== undefined ? fetchedData.premiumUsers : (fetchedData.PremiumUsers || 0);
         
-        document.getElementById('stat-total-users').textContent = data.totalUsers !== undefined ? data.totalUsers.toLocaleString() : '0';
-        document.getElementById('stat-premium-users').textContent = data.premiumUsers !== undefined ? data.premiumUsers.toLocaleString() : '0';
-      } catch (error) {
-        console.warn('Backend veritabanı bağlantısı kurulamadı. Önizleme sayısı gösteriliyor.');
+        document.getElementById('stat-total-users').textContent = total.toLocaleString();
+        document.getElementById('stat-premium-users').textContent = premium.toLocaleString();
+      } else {
+        console.warn('Canlı C# API ulaşılamıyor (Statik Demo Modu).');
         
-        // Vercel statik önizleme modunda "Yükleniyor..." kalmaması için sabit veritabanı üye sayısını bas
-        document.getElementById('stat-total-users').textContent = '1,248';
-        document.getElementById('stat-premium-users').textContent = '85';
+        // Bağlantı yokken feyk veri gösterildiğini belirt
+        document.getElementById('stat-total-users').innerHTML = '1,248 <span style="font-size:0.72rem; color:#f59e0b; display:block; font-weight:500; margin-top:4px;">⚠️ Demo (DB Bağlanamadı)</span>';
+        document.getElementById('stat-premium-users').innerHTML = '85 <span style="font-size:0.72rem; color:#f59e0b; display:block; font-weight:500; margin-top:4px;">⚠️ Demo (DB Bağlanamadı)</span>';
       }
 
       // Populate Anime Dropdown
