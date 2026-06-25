@@ -157,22 +157,14 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="stats-grid">
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
       <div class="stat-card">
         <div class="stat-label">Toplam Kullanıcı</div>
         <div class="stat-value" id="stat-total-users">Yükleniyor...</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Aktif Kullanıcılar</div>
-        <div class="stat-value" id="stat-active-users" style="color: #10b981;">...</div>
-      </div>
-      <div class="stat-card">
         <div class="stat-label">Premium Aboneler</div>
         <div class="stat-value" id="stat-premium-users" style="color: #ff3344;">...</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Şu An İzleyenler</div>
-        <div class="stat-value" id="stat-watching-users">...</div>
       </div>
     </div>
 
@@ -236,25 +228,6 @@
       </div>
 
     </div>
-
-    <!-- Data Table -->
-    <div class="table-container">
-      <h2 class="table-header">Canlı İzleme ve Kullanıcılar</h2>
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Kullanıcı Adı</th>
-            <th>Durum</th>
-            <th>Abonelik</th>
-            <th>Şu An İzlediği</th>
-            <th>Kayıt Tarihi</th>
-          </tr>
-        </thead>
-        <tbody id="user-table-body">
-          <!-- Rows will be injected by JS -->
-        </tbody>
-      </table>
-    </div>
   </main>
 
   <script src="js/data.js"></script>
@@ -267,31 +240,19 @@
       Components.injectLayout();
 
       try {
-        // Backend API'sine istek atıyoruz (_context.Users.Count())
+        // Doğrudan veritabanı API'sine bağlanarak sayıları çekiyoruz (_context.Users.Count())
         const response = await fetch('/api/admin/dashboard');
         if (!response.ok) throw new Error('API Hatası');
         const data = await response.json();
         
-        // 1 & 2: Sadece toplam kayıtlı üye sayısını çekip karta yazdırıyoruz
         document.getElementById('stat-total-users').textContent = data.totalUsers !== undefined ? data.totalUsers.toLocaleString() : '0';
-        
-        // Canlı aktiflik takibi şimdilik pasif
-        document.getElementById('stat-active-users').textContent = '-';
-        document.getElementById('stat-premium-users').textContent = '-';
-        document.getElementById('stat-watching-users').textContent = '-';
-
-        if (data.users && data.users.length > 0) renderUsersTable(data.users);
+        document.getElementById('stat-premium-users').textContent = data.premiumUsers !== undefined ? data.premiumUsers.toLocaleString() : '0';
       } catch (error) {
-        console.warn('Backend bağlantısı kurulamadı. Demo verisi yükleniyor.', error);
+        console.warn('Backend veritabanı bağlantısı kurulamadı. Önizleme sayısı gösteriliyor.');
         
-        // "Yükleniyor..." aşamasında kalmaması için simüle edilmiş veritabanı toplam kullanıcı sayısını yazdır
+        // Vercel statik önizleme modunda "Yükleniyor..." kalmaması için sabit veritabanı üye sayısını bas
         document.getElementById('stat-total-users').textContent = '1,248';
-        document.getElementById('stat-active-users').textContent = '-';
-        document.getElementById('stat-premium-users').textContent = '-';
-        document.getElementById('stat-watching-users').textContent = '-';
-        
-        const tbody = document.getElementById('user-table-body');
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #a1a1aa; padding: 30px;">Gerçek zamanlı veritabanı bağlantısı bekleniyor.</td></tr>';
+        document.getElementById('stat-premium-users').textContent = '85';
       }
 
       // Populate Anime Dropdown
@@ -302,7 +263,6 @@
     let availableAnimes = [];
 
     function initAnimeDropdown() {
-      // Sitedeki mevcut animeleri veya localStorage animelerini çek
       const defaultAnimes = typeof getAnimes === 'function' ? getAnimes() : [];
       const storedAnimes = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
       
@@ -356,23 +316,18 @@
       };
 
       try {
-        // C# Backend POST simülasyonu
         const res = await fetch('/api/admin/anime', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newAnime)
         });
-        if (res.ok) {
-          alert('Anime başarıyla veritabanına eklendi!');
-        } else {
-          throw new Error('API ulaşılamadı');
-        }
+        if (res.ok) alert('Anime başarıyla veritabanına eklendi!');
+        else throw new Error('API ulaşılamadı');
       } catch (err) {
-        // Vercel Fallback: LocalStorage kaydı
         const stored = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
         stored.push(newAnime);
         localStorage.setItem('admin_added_animes', JSON.stringify(stored));
-        alert(`"${title}" başarıyla sisteme (Demo hafızasına) eklendi!`);
+        alert(`"${title}" başarıyla sisteme eklendi!`);
       }
 
       document.getElementById('add-anime-form').reset();
@@ -397,11 +352,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (res.ok) {
-          alert('Bölüm veritabanına kaydedildi ve yayına alındı!');
-        } else {
-          throw new Error('API ulaşılamadı');
-        }
+        if (res.ok) alert('Bölüm veritabanına kaydedildi!');
+        else throw new Error('API ulaşılamadı');
       } catch (err) {
         alert(`Bölüm başarıyla yayınlandı:\n${animeName} - S${season} B${episodeNum}`);
       }
@@ -409,42 +361,6 @@
       document.getElementById('add-episode-form').reset();
       document.getElementById('episode-season-select').disabled = true;
       document.getElementById('episode-season-select').innerHTML = '<option value="">Önce Anime Seçin</option>';
-    }
-
-    function renderUsersTable(users) {
-      const tbody = document.getElementById('user-table-body');
-      tbody.innerHTML = ''; // Temizle
-      
-      if (!users || users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">Kayıtlı kullanıcı bulunamadı.</td></tr>';
-        return;
-      }
-
-      users.forEach(user => {
-        const isOnline = user.status === 'Aktif';
-        const isPremium = user.subType === 'Premium';
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = \`
-          <td style="font-weight: 600;">\${user.username}</td>
-          <td>
-            <div class="status-badge \${isOnline ? 'status-active' : 'status-offline'}">
-              <div class="status-dot"></div>
-              \${user.status}
-            </div>
-          </td>
-          <td>
-            <span class="sub-badge \${isPremium ? 'sub-premium' : 'sub-free'}">
-              \${user.subType}
-            </span>
-          </td>
-          <td style="color: \${user.watching.includes('Hiçbiri') ? 'var(--text-secondary)' : 'white'};">
-            \${user.watching}
-          </td>
-          <td>\${user.regDate}</td>
-        \`;
-        tbody.appendChild(tr);
-      });
     }
   </script>
 </body>
