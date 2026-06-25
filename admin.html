@@ -346,9 +346,7 @@
 
     function initAnimeDropdown() {
       const defaultAnimes = typeof getAnimes === 'function' ? getAnimes() : [];
-      const storedAnimes = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
-      
-      availableAnimes = [...defaultAnimes.map(a => ({ id: a.id, title: a.title, seasons: a.seasons || 2 })), ...storedAnimes];
+      availableAnimes = defaultAnimes.map(a => ({ id: a.id, title: a.title, seasons: a.seasons || 2, episodes: a.episodes || [] }));
       
       const select = document.getElementById('episode-anime-select');
       const schSelect = document.getElementById('schedule-anime-select');

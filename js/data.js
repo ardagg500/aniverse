@@ -69,7 +69,8 @@ const mockData = {
 function getAnimes() {
   try {
     const stored = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
-    return [...mockData.animes, ...stored];
+    // Eklenen yeni animeleri en başa koyuyoruz ki ana sayfada ve listelerde hemen en üstte gözüksün
+    return [...stored, ...mockData.animes];
   } catch {
     return mockData.animes;
   }
@@ -80,6 +81,19 @@ Object.defineProperty(window, 'ANIME_DATA', {
   get: getAnimes,
   configurable: true
 });
-const HERO_SLIDES = mockData.heroSlides;
+
+Object.defineProperty(window, 'HERO_SLIDES', {
+  get: function() {
+    return getAnimes().slice(0, 5).map((a, idx) => ({
+      id: idx + 1,
+      animeId: a.id,
+      tagline: a.season || "Yeni Bölüm Yayında",
+      ctaText: "Hemen İzle",
+      banner: a.banner || a.image
+    }));
+  },
+  configurable: true
+});
+
 const GENRES = mockData.genresList;
 const CONTINUE_WATCHING = mockData.continueWatching;
