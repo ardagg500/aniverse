@@ -239,13 +239,38 @@
       // Inject Header and Footer
       Components.injectLayout();
 
-      // Direkt sitede (tarayıcı hafızasında) %100 kusursuz çalışacak şekilde sayıları basar
-      const storedUsers = JSON.parse(localStorage.getItem('aniverse_users') || '[]');
-      const totalUserCount = 1248 + storedUsers.length;
-      const premiumUserCount = 85;
-      
-      document.getElementById('stat-total-users').textContent = totalUserCount.toLocaleString();
-      document.getElementById('stat-premium-users').textContent = premiumUserCount.toLocaleString();
+      // 1. Önce C# Veritabanından (API) gerçek sayıları çekmeyi dener
+      const endpoints = ['/api/admin/dashboard', '/Admin/GetStats', '/Admin/GetDashboardStats', '/Admin/stats', '/api/Admin/dashboard'];
+      let fetchedData = null;
+
+      for (const ep of endpoints) {
+        try {
+          const response = await fetch(ep);
+          if (response.ok) {
+            fetchedData = await response.json();
+            break;
+          }
+        } catch (err) {}
+      }
+
+      if (fetchedData) {
+        const total = fetchedData.totalUsers !== undefined ? fetchedData.totalUsers : (fetchedData.TotalUsers !== undefined ? fetchedData.TotalUsers : (fetchedData.count || 0));
+        const premium = fetchedData.premiumUsers !== undefined ? fetchedData.premiumUsers : (fetchedData.PremiumUsers || 0);
+        
+        document.getElementById('stat-total-users').textContent = total.toLocaleString();
+        document.getElementById('stat-premium-users').textContent = premium.toLocaleString();
+      } else {
+        // 2. C# Sunucusu yoksa tarayıcı veritabanında (LocalStorage DB) tam olarak ne varsa sadece onu bas (1248 sahte sayısı yok)
+        const storedUsers = JSON.parse(localStorage.getItem('aniverse_users') || '[]');
+        const activeUser = JSON.parse(localStorage.getItem('aniverse_currentUser') || 'null');
+        
+        // Databasede ne varsa sadece o: Eğer kayıtlı üye yoksa ama şu an birisi giriş yapmışsa 1, yoksa storedUsers.length
+        const exactCount = storedUsers.length > 0 ? storedUsers.length : (activeUser ? 1 : 0);
+        const exactPremium = storedUsers.filter(u => u.subType === 'Premium' || u.isPremium).length;
+
+        document.getElementById('stat-total-users').textContent = exactCount.toLocaleString();
+        document.getElementById('stat-premium-users').textContent = exactPremium.toLocaleString();
+      }
 
       // Populate Anime Dropdown
       initAnimeDropdown();
