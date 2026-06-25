@@ -521,7 +521,8 @@
       const container = document.getElementById('active-schedule-list');
       if (!container) return;
       const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null') || [
-        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
+        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' },
+        { id: 'sch_2', day: 'Salı', animeId: 112, time: '21:00' }
       ];
 
       if (stored.length === 0) {
@@ -552,7 +553,8 @@
       const time = document.getElementById('schedule-time-input').value;
 
       const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null') || [
-        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
+        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' },
+        { id: 'sch_2', day: 'Salı', animeId: 112, time: '21:00' }
       ];
 
       stored.push({ id: 'sch_' + Date.now(), day, animeId: parseInt(animeId) || animeId, time });
@@ -563,7 +565,8 @@
 
     function removeScheduleItem(idx) {
       const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null') || [
-        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
+        { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' },
+        { id: 'sch_2', day: 'Salı', animeId: 112, time: '21:00' }
       ];
       stored.splice(idx, 1);
       localStorage.setItem('admin_broadcast_schedule', JSON.stringify(stored));

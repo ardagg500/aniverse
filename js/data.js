@@ -11,10 +11,17 @@ const mockData = {
       tagline: "Yeni Bölüm Yayında",
       ctaText: "Hemen İzle",
       banner: "assets/asanagi_banner.png"
+    },
+    {
+      id: 2,
+      animeId: 112,
+      tagline: "Yaşamdan Kesitler & Romantizm",
+      ctaText: "Hemen İzle",
+      banner: "assets/smoking_banner.png"
     }
   ],
 
-  // ── All Anime Database (Uyduruk stock animeler temizlendi) ──
+  // ── All Anime Database ──
   animes: [
     {
       id: 111,
@@ -23,7 +30,7 @@ const mockData = {
       image: "assets/asanagi_poster.png",
       banner: "assets/asanagi_banner.png",
       description: "Maehara Maki yeni okuluna ilk girişini bombalar ama bir şekilde ona yardım etmek için geri döner.",
-      genres: ["Lise", "Romantik", "Aksiyon"],
+      genres: ["Lise", "Romantik", "Yaşamdan Kesitler"],
       rating: 8.5,
       year: 2026,
       season: "Bahar",
@@ -38,6 +45,32 @@ const mockData = {
           number: 1, 
           title: "1. Bölüm", 
           duration: "24:00", 
+          embedUrl: "https://tau-video.xyz/embed/69d5763298be3e47efffd7fd?vid=749135" 
+        }
+      ]
+    },
+    {
+      id: 112,
+      title: "Smoking Behind the Supermarket with You",
+      titleJp: "Super no Ura de Yani Suu Futari",
+      image: "assets/smoking_poster.png",
+      banner: "assets/smoking_banner.png",
+      description: "İşten yorgun argın çıkan orta yaşlı Sasaki, market çalışanı Yamada ve gizemli Tayama ile süpermarketin arkasında sigara molasında buluşur.",
+      genres: ["Romantik", "Yaşamdan Kesitler", "Komedi"],
+      rating: 8.9,
+      year: 2026,
+      season: "Yaz",
+      status: "Devam Ediyor",
+      studio: "Square Enix",
+      totalEpisodes: 12,
+      popularity: 92,
+      isNew: true,
+      quality: "1080p",
+      episodes: [
+        { 
+          number: 1, 
+          title: "1. Bölüm: Sigara Molası", 
+          duration: "23:45", 
           embedUrl: "https://tau-video.xyz/embed/69d5763298be3e47efffd7fd?vid=749135" 
         }
       ]
