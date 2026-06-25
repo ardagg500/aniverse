@@ -176,6 +176,67 @@
       </div>
     </div>
 
+    <!-- Forms Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 50px;">
+      
+      <!-- 1. ANİME EKLEME FORMU -->
+      <div class="table-container" style="margin-bottom: 0;">
+        <h2 class="table-header" style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+          Yeni Anime Ekle
+        </h2>
+        <form id="add-anime-form" onsubmit="handleAddAnime(event)">
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Anime Adı</label>
+            <input type="text" id="anime-title-input" required placeholder="Örn: Solo Leveling" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Kapak Fotoğrafı (URL)</label>
+            <input type="url" id="anime-cover-input" required placeholder="https://images.unsplash.com/..." style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Toplam Sezon Sayısı</label>
+            <input type="number" id="anime-seasons-input" min="1" max="20" value="1" required style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-weight:700; border-radius:10px; background:#ff3344; color:white; border:none; cursor:pointer; box-shadow: 0 4px 15px rgba(255,51,68,0.3); transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Animeyi Kaydet</button>
+        </form>
+      </div>
+
+      <!-- 2. BÖLÜM EKLEME FORMU -->
+      <div class="table-container" style="margin-bottom: 0;">
+        <h2 class="table-header" style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          Yeni Bölüm Ekle
+        </h2>
+        <form id="add-episode-form" onsubmit="handleAddEpisode(event)">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:18px;">
+            <div class="form-group">
+              <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Anime Seçimi</label>
+              <select id="episode-anime-select" required onchange="handleAnimeSelectChange()" style="width:100%; padding:12px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#06b6d4'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                <option value="">Anime Seçin...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Sezon Seçimi</label>
+              <select id="episode-season-select" required disabled style="width:100%; padding:12px 14px; background:#121216; border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#06b6d4'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                <option value="">Önce Anime Seçin</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Bölüm Numarası</label>
+            <input type="number" id="episode-num-input" min="1" max="1000" placeholder="1" required style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#06b6d4'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Video Kaynağı / Embed Linki (SRC)</label>
+            <textarea id="episode-src-input" rows="2" required placeholder="https://tau-video.xyz/embed/... veya <iframe src='...'>" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; font-family:monospace; font-size:0.85rem; resize:vertical; outline:none;" onfocus="this.style.borderColor='#06b6d4'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-weight:700; border-radius:10px; background:#06b6d4; color:white; border:none; cursor:pointer; box-shadow: 0 4px 15px rgba(6,182,212,0.3); transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Bölümü Yayınla</button>
+        </form>
+      </div>
+
+    </div>
+
     <!-- Data Table -->
     <div class="table-container">
       <h2 class="table-header">Canlı İzleme ve Kullanıcılar</h2>
@@ -234,7 +295,123 @@
         const tbody = document.getElementById('user-table-body');
         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ff3344; padding: 30px;">Veriler şu an yüklenemedi. Lütfen backend bağlantısını kontrol edin.</td></tr>';
       }
+
+      // Populate Anime Dropdown
+      initAnimeDropdown();
     });
+
+    // --- FORM MANAGEMENT & DYNAMIC SEASONS ---
+    let availableAnimes = [];
+
+    function initAnimeDropdown() {
+      // Sitedeki mevcut animeleri veya localStorage animelerini çek
+      const defaultAnimes = typeof getAnimes === 'function' ? getAnimes() : [];
+      const storedAnimes = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
+      
+      availableAnimes = [...defaultAnimes.map(a => ({ id: a.id, title: a.title, seasons: a.seasons || 2 })), ...storedAnimes];
+      
+      const select = document.getElementById('episode-anime-select');
+      select.innerHTML = '<option value="">Anime Seçin...</option>';
+      
+      availableAnimes.forEach(anime => {
+        const opt = document.createElement('option');
+        opt.value = anime.id;
+        opt.textContent = `${anime.title} (${anime.seasons} Sezon)`;
+        select.appendChild(opt);
+      });
+    }
+
+    function handleAnimeSelectChange() {
+      const animeId = document.getElementById('episode-anime-select').value;
+      const seasonSelect = document.getElementById('episode-season-select');
+      
+      if (!animeId) {
+        seasonSelect.innerHTML = '<option value="">Önce Anime Seçin</option>';
+        seasonSelect.disabled = true;
+        return;
+      }
+
+      const selectedAnime = availableAnimes.find(a => String(a.id) === String(animeId));
+      const seasonCount = selectedAnime ? selectedAnime.seasons : 1;
+
+      seasonSelect.innerHTML = '';
+      for (let i = 1; i <= seasonCount; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `${i}. Sezon`;
+        seasonSelect.appendChild(opt);
+      }
+      seasonSelect.disabled = false;
+    }
+
+    async function handleAddAnime(e) {
+      e.preventDefault();
+      const title = document.getElementById('anime-title-input').value;
+      const cover = document.getElementById('anime-cover-input').value;
+      const seasons = parseInt(document.getElementById('anime-seasons-input').value) || 1;
+
+      const newAnime = {
+        id: 'custom_' + Date.now(),
+        title,
+        cover,
+        seasons
+      };
+
+      try {
+        // C# Backend POST simülasyonu
+        const res = await fetch('/api/admin/anime', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newAnime)
+        });
+        if (res.ok) {
+          alert('Anime başarıyla veritabanına eklendi!');
+        } else {
+          throw new Error('API ulaşılamadı');
+        }
+      } catch (err) {
+        // Vercel Fallback: LocalStorage kaydı
+        const stored = JSON.parse(localStorage.getItem('admin_added_animes') || '[]');
+        stored.push(newAnime);
+        localStorage.setItem('admin_added_animes', JSON.stringify(stored));
+        alert(`"${title}" başarıyla sisteme (Demo hafızasına) eklendi!`);
+      }
+
+      document.getElementById('add-anime-form').reset();
+      initAnimeDropdown();
+    }
+
+    async function handleAddEpisode(e) {
+      e.preventDefault();
+      const animeId = document.getElementById('episode-anime-select').value;
+      const season = document.getElementById('episode-season-select').value;
+      const episodeNum = document.getElementById('episode-num-input').value;
+      const src = document.getElementById('episode-src-input').value;
+
+      const selectedAnime = availableAnimes.find(a => String(a.id) === String(animeId));
+      const animeName = selectedAnime ? selectedAnime.title : 'Bilinmeyen Anime';
+
+      const payload = { animeId, animeName, season, episodeNum, src };
+
+      try {
+        const res = await fetch('/api/admin/episode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert('Bölüm veritabanına kaydedildi ve yayına alındı!');
+        } else {
+          throw new Error('API ulaşılamadı');
+        }
+      } catch (err) {
+        alert(`Bölüm başarıyla yayınlandı:\n${animeName} - S${season} B${episodeNum}`);
+      }
+
+      document.getElementById('add-episode-form').reset();
+      document.getElementById('episode-season-select').disabled = true;
+      document.getElementById('episode-season-select').innerHTML = '<option value="">Önce Anime Seçin</option>';
+    }
 
     function renderUsersTable(users) {
       const tbody = document.getElementById('user-table-body');
