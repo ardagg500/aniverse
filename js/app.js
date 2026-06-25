@@ -125,8 +125,7 @@ function getBroadcastSchedule() {
   const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null');
   if (stored !== null) return stored;
   return [
-    { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' },
-    { id: 'sch_2', day: 'Salı', animeId: 112, time: '21:00' }
+    { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
   ];
 }
 
