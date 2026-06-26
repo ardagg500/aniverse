@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keşfet & Ara | AniVerse</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .search-header {
+      padding: var(--space-8) 0;
+      background: linear-gradient(to bottom, rgba(var(--accent-primary-rgb), 0.1) 0%, transparent 100%);
+      margin-top: calc(-1 * var(--nav-height));
+      padding-top: calc(var(--nav-height) + var(--space-8));
+      margin-bottom: var(--space-8);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    
+    .filter-label {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+    
+    .filter-select {
+      min-width: 140px;
+    }
+    
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+    }
+  </style>
+</head>
+<body>
+  
+  <main class="page-enter">
+    
+    <div class="search-header">
+      <div class="container">
+        <div class="text-center mb-6">
+          <h1 class="section-title justify-center text-3xl mb-2">Anime Keşfet</h1>
+          <p class="text-secondary">Binlerce anime arasından favorinizi bulun</p>
+        </div>
+        
+        <div class="search-bar animate-fade-in-up">
+          <input type="text" class="glass-input" id="search-input" placeholder="Anime adı, tür veya stüdyo ara...">
+          <div class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+          <button class="clear-btn" id="clear-search-btn" aria-label="Temizle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        
+        <div class="filters-bar animate-fade-in-up delay-2">
+          <div class="filter-group">
+            <span class="filter-label">Tür:</span>
+            <select class="glass-select filter-select" id="genre-filter">
+              <option value="all">Tümü</option>
+              <option value="Aksiyon">Aksiyon</option>
+              <option value="Macera">Macera</option>
+              <option value="Komedi">Komedi</option>
+              <option value="Dram">Dram</option>
+              <option value="Fantastik">Fantastik</option>
+              <option value="Bilim Kurgu">Bilim Kurgu</option>
+              <option value="Romantik">Romantik</option>
+              <option value="Gizem">Gizem</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <span class="filter-label">Yıl:</span>
+            <select class="glass-select filter-select" id="year-filter">
+              <option value="all">Tümü</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <span class="filter-label">Durum:</span>
+            <select class="glass-select filter-select" id="status-filter">
+              <option value="all">Tümü</option>
+              <option value="Devam Ediyor">Devam Ediyor</option>
+              <option value="Tamamlandı">Tamamlandı</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <span class="filter-label">Sırala:</span>
+            <select class="glass-select filter-select" id="sort-filter">
+              <option value="popular">En Popüler</option>
+              <option value="rating">Puan (Yüksek-Düşük)</option>
+              <option value="newest">En Yeni</option>
+              <option value="name">İsim (A-Z)</option>
+            </select>
+          </div>
+          
+          <button class="btn btn-ghost btn-sm" onclick="resetFilters()">Sıfırla</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container section pt-0">
+      <div class="results-header">
+        <h2 class="text-xl font-bold" id="results-count">Yükleniyor...</h2>
+      </div>
+      
+      <div class="grid grid-auto-fill" id="search-results">
+        <!-- Injected by search.js -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/router.js"></script>
+</body>
+</html>
+

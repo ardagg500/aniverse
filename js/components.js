@@ -258,7 +258,7 @@ const Components = {
     const isIndex = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/aniverse/');
     const isSearch = currentPath.includes('search.html');
     const isProfile = currentPath.includes('profile.html');
-    const isSpeedTest = currentPath.includes('speedtest.html');
+    const isSpeedTest = currentPath.includes('speedtest.html') || currentPath.includes('SpeedTest');
     
     return `
       <aside class="sidebar">
@@ -277,7 +277,7 @@ const Components = {
           </a>
         </div>
         <div class="sidebar-bottom">
-          <a href="speedtest.html" class="sidebar-icon ${isSpeedTest ? 'active' : ''}" data-route="speedtest" title="Hız Testi">
+          <a href="/Home/SpeedTest" class="sidebar-icon ${isSpeedTest ? 'active' : ''}" data-route="speedtest" title="Hız Testi">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
           </a>
           <a href="profile.html#tab-settings" class="sidebar-icon" data-route="settings" title="Ayarlar">

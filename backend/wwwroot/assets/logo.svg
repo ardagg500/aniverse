@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" style="width: 100%; height: 100%; filter: drop-shadow(0px 0px 8px rgba(255,51,68,0.8));">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,51,68,0.2)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+  <polygon points="20,2 38,11 38,29 20,38 2,29 2,11" fill="url(#logoGrad)" stroke="#ff3344" stroke-width="2"/>
+  <path d="M20,10 L32,30 L25,30 L20,20 L15,30 L8,30 Z" fill="#ffffff"/>
+  <path d="M20,24 L24,30 L16,30 Z" fill="#ff3344"/>
+</svg>
