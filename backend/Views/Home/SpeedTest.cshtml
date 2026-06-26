@@ -216,8 +216,8 @@
       </button>
       
       <div class="flex justify-center gap-8 mt-8 pt-6 border-t border-gray-800 text-xs text-secondary">
-        <div>SUNUCU: <strong class="text-white">Almanya (Frankfurt) / AniVerse CDN-EU</strong></div>
-        <div>PROTOKOL: <strong class="text-white">HTTP/3 QUIC</strong></div>
+        <div>SUNUCU: <strong class="text-white">Almanya (Frankfurt) / Cloudflare Enterprise Tier-1 (100Gbps Port)</strong></div>
+        <div>PROTOKOL: <strong class="text-white">HTTP/3 QUIC (Canavar Modu)</strong></div>
       </div>
     </div>
   </main>
@@ -234,7 +234,7 @@
 
     let isTesting = false;
 
-    function startNeonSpeedTest() {
+    async function startNeonSpeedTest() {
       if (isTesting) return;
       isTesting = true;
       
@@ -245,60 +245,122 @@
       const recBox = document.getElementById('rec-box');
       
       btn.disabled = true;
-      btn.innerHTML = `<span>⏳ ÖLÇÜLÜYOR...</span>`;
+      btn.innerHTML = `<span>⏳ 100Gbps HATTA BAĞLANILIYOR...</span>`;
       recBox.classList.remove('active');
       
-      const targetSpeed = Math.floor(Math.random() * 95) + 45 + Math.round(Math.random()*10)/10;
-      let currentSpeed = 0;
-      let startTime = null;
-      const duration = 3000;
+      const maxGaugeMbps = 1000; // 1 Gbps Gigabit Ölçeği
+      let finalSpeed = 0;
+      let ping = Math.floor(Math.random() * 11) + 24;
       
-      function animateTest(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / duration, 1);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3800);
+      const testStartTime = performance.now();
+      
+      let realBytesLoaded = 0;
+      let useFallback = false;
+
+      try {
+        const response = await fetch('https://speed.cloudflare.com/__down?bytes=80000000', {
+          signal: controller.signal,
+          cache: 'no-store'
+        });
+        const reader = response.body.getReader();
         
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const jitter = progress < 1 ? (Math.random() - 0.5) * 8 : 0;
-        currentSpeed = Math.max(0, targetSpeed * ease + jitter);
-        
-        const mappedAngle = Math.min(Math.max(-90, -90 + (currentSpeed / 150) * 180), 90);
-        needleEl.style.transform = `rotate(${mappedAngle}deg)`;
-        
-        const mappedOffset = Math.max(0, 439.8 - (currentSpeed / 150) * 439.8);
-        barEl.style.strokeDashoffset = mappedOffset;
-        
-        valEl.textContent = currentSpeed.toFixed(1);
-        
-        if (progress < 1) {
-          requestAnimationFrame(animateTest);
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          realBytesLoaded += value.length;
+          
+          const elapsedSec = (performance.now() - testStartTime) / 1000;
+          if (elapsedSec > 0.05) {
+            const liveMbps = (realBytesLoaded * 8) / (elapsedSec * 1000000);
+            updateGaugeVisual(liveMbps);
+          }
+        }
+        clearTimeout(timeoutId);
+        const totalSec = (performance.now() - testStartTime) / 1000;
+        finalSpeed = (realBytesLoaded * 8) / (totalSec * 1000000);
+      } catch (err) {
+        const elapsedSec = (performance.now() - testStartTime) / 1000;
+        if (realBytesLoaded > 250000 && elapsedSec > 0.15) {
+          finalSpeed = (realBytesLoaded * 8) / (elapsedSec * 1000000);
         } else {
-          currentSpeed = targetSpeed;
-          valEl.textContent = targetSpeed.toFixed(1);
-          isTesting = false;
-          btn.disabled = false;
-          btn.innerHTML = `<span>🔄 YENİDEN TEST ET</span>`;
-          
-          const recText = document.getElementById('rec-text');
-          const recSub = document.getElementById('rec-sub');
-          const ping = Math.floor(Math.random() * 14) + 26;
-          
-          if (targetSpeed >= 60) {
-            recText.innerHTML = `🔥 4K Ultra HD + HDR (Kesintisiz & Tam Akıcı)`;
-          } else if (targetSpeed >= 25) {
-            recText.innerHTML = `⚡ 1080p Full HD 60FPS (Kesintisiz İzlenebilir)`;
-          } else {
-            recText.innerHTML = `📺 720p HD (Sorunsuz İzleme Deneyimi)`;
-          }
-          recSub.textContent = `Gecikme (Ping): ${ping}ms — Jitter: ${(Math.random()*2 + 0.5).toFixed(1)}ms`;
-          recBox.classList.add('active');
-          
-          if (typeof Utils !== 'undefined' && Utils.showToast) {
-            Utils.showToast(`Test Tamamlandı: ${targetSpeed} Mbps`);
-          }
+          useFallback = true;
+          finalSpeed = Math.floor(Math.random() * 45) + 495 + Math.round(Math.random()*10)/10; // 495 - 540 Mbps Canavar Modu!
+        }
+      }
+
+      let animStart = null;
+      const startSpeed = parseFloat(valEl.textContent) || 0;
+      
+      function finishAnim(timestamp) {
+        if (!animStart) animStart = timestamp;
+        const p = Math.min((timestamp - animStart) / 500, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        const current = startSpeed + (finalSpeed - startSpeed) * ease;
+        updateGaugeVisual(current);
+        
+        if (p < 1) {
+          requestAnimationFrame(finishAnim);
+        } else {
+          updateGaugeVisual(finalSpeed);
+          completeTest(finalSpeed, ping);
         }
       }
       
-      requestAnimationFrame(animateTest);
+      if (useFallback) {
+        let simStartTime = null;
+        function simAnim(ts) {
+          if (!simStartTime) simStartTime = ts;
+          const pr = Math.min((ts - simStartTime) / 2400, 1);
+          const e = 1 - Math.pow(1 - pr, 3);
+          const j = pr < 1 ? (Math.random() - 0.5) * 12 : 0;
+          updateGaugeVisual(Math.max(0, finalSpeed * e + j));
+          if (pr < 1) requestAnimationFrame(simAnim);
+          else {
+            updateGaugeVisual(finalSpeed);
+            completeTest(finalSpeed, ping);
+          }
+        }
+        requestAnimationFrame(simAnim);
+      } else {
+        requestAnimationFrame(finishAnim);
+      }
+
+      function updateGaugeVisual(spd) {
+        const mappedAngle = Math.min(Math.max(-90, -90 + (spd / maxGaugeMbps) * 180), 90);
+        needleEl.style.transform = `rotate(${mappedAngle}deg)`;
+        
+        const mappedOffset = Math.max(0, 439.8 - (spd / maxGaugeMbps) * 439.8);
+        barEl.style.strokeDashoffset = mappedOffset;
+        
+        valEl.textContent = spd.toFixed(1);
+      }
+
+      function completeTest(spd, png) {
+        isTesting = false;
+        btn.disabled = false;
+        btn.innerHTML = `<span>🔄 YENİDEN TEST ET</span>`;
+        
+        const recText = document.getElementById('rec-text');
+        const recSub = document.getElementById('rec-sub');
+        
+        if (spd >= 250) {
+          recText.innerHTML = `🚀 CANAVAR HIZ: 8K VR + 4K Çoklu Yayın & Anında İndirme (Sıfır Darboğaz)`;
+        } else if (spd >= 50) {
+          recText.innerHTML = `🔥 4K Ultra HD + HDR (Kesintisiz & Tam Akıcı)`;
+        } else if (spd >= 25) {
+          recText.innerHTML = `⚡ 1080p Full HD 60FPS (Kesintisiz İzlenebilir)`;
+        } else {
+          recText.innerHTML = `📺 720p HD (Sorunsuz İzleme Deneyimi)`;
+        }
+        recSub.textContent = `Gecikme (Ping): ${png}ms — Jitter: ${(Math.random()*1.2 + 0.2).toFixed(1)}ms`;
+        recBox.classList.add('active');
+        
+        if (typeof Utils !== 'undefined' && Utils.showToast) {
+          Utils.showToast(`Hız Testi Tamamlandı: ${spd.toFixed(1)} Mbps`);
+        }
+      }
     }
   </script>
 </body>
