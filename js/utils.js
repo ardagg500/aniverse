@@ -4,6 +4,26 @@
 
 const Utils = {
 
+  // ── Security & Sanitization Helpers (XSS Protection) ──
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  },
+
+  sanitizeUrl(url) {
+    if (!url) return '';
+    const clean = String(url).trim();
+    if (clean.toLowerCase().startsWith('javascript:') || clean.toLowerCase().startsWith('data:')) {
+      return 'about:blank';
+    }
+    return clean;
+  },
+
   // ── LocalStorage Helpers ──
 
   getFromStorage(key) {
@@ -77,7 +97,6 @@ const Utils = {
 
   addToHistory(animeId, episode) {
     const history = this.getHistory();
-    // Remove existing entry for same anime+episode
     const filtered = history.filter(h => !(h.animeId === animeId && h.episode === episode));
     filtered.unshift({
       animeId,
@@ -85,7 +104,6 @@ const Utils = {
       timestamp: Date.now(),
       date: new Date().toLocaleDateString('tr-TR')
     });
-    // Keep only last 50 entries
     this.saveToStorage('history', filtered.slice(0, 50));
   },
 
@@ -117,7 +135,6 @@ const Utils = {
   searchAnime(query, filters = {}) {
     let results = [...ANIME_DATA];
 
-    // Text search
     if (query && query.trim()) {
       const q = query.toLowerCase().trim();
       results = results.filter(a =>
@@ -129,22 +146,18 @@ const Utils = {
       );
     }
 
-    // Genre filter
     if (filters.genre && filters.genre !== 'all') {
       results = results.filter(a => a.genres.includes(filters.genre));
     }
 
-    // Year filter
     if (filters.year && filters.year !== 'all') {
       results = results.filter(a => a.year === parseInt(filters.year));
     }
 
-    // Status filter
     if (filters.status && filters.status !== 'all') {
       results = results.filter(a => a.status === filters.status);
     }
 
-    // Sorting
     switch (filters.sort) {
       case 'rating':
         results.sort((a, b) => b.rating - a.rating);
@@ -279,7 +292,7 @@ const Utils = {
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
       <span class="toast-icon">${icons[type] || icons.info}</span>
-      <span>${message}</span>
+      <span>${this.escapeHtml(message)}</span>
     `;
 
     container.appendChild(toast);

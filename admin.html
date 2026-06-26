@@ -501,9 +501,14 @@
           <span style="font-size: 1.8rem; filter: drop-shadow(0 0 10px rgba(16,185,129,0.5));">🌐</span>
           <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: white; margin: 0;">İçerik Yönetimi & Canlı Site Senkronu</h2>
         </div>
-        <button type="button" class="publish-btn" onclick="syncAllAnimesToProduction()" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #000; padding: 10px 18px; font-size: 0.88rem; box-shadow: 0 4px 20px rgba(16,185,129,0.4);">
-          🚀 Tüm Yerel Verileri Canlıya Gönder
-        </button>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn btn-ghost" onclick="revokeGitHubPat()" style="padding: 10px 14px; font-size: 0.82rem; color:#ff3344; border:1px solid rgba(255,51,68,0.3); border-radius:10px;" title="Tarayıcıda kayıtlı GitHub Token yetkisini güvenle siler">
+            🔐 Token Sil (Logout)
+          </button>
+          <button type="button" class="publish-btn" onclick="syncAllAnimesToProduction()" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #000; padding: 10px 18px; font-size: 0.88rem; box-shadow: 0 4px 20px rgba(16,185,129,0.4);">
+            🚀 Tüm Yerel Verileri Canlıya Gönder
+          </button>
+        </div>
       </div>
       <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 25px;">Yerel bilgisayarınızda (localhost) eklediğiniz içerikleri tek tıkla internetteki canlı sitemizin veri tabanına (API POST) gönderebilir veya istemediğiniz içerikleri silebilirsiniz.</p>
       
@@ -1052,8 +1057,15 @@
     }
     window.closeGitHubModal = closeGitHubModal;
 
+    function revokeGitHubPat() {
+      sessionStorage.removeItem('aniverse_github_pat');
+      localStorage.removeItem('aniverse_github_pat');
+      showSyncToast("🔐 Güvenlik Başarılı: Tarayıcı hafızasındaki GitHub Token yetkisi silindi!", false);
+    }
+    window.revokeGitHubPat = revokeGitHubPat;
+
     async function syncAnimeToProduction(animeId, title) {
-      const token = localStorage.getItem('aniverse_github_pat');
+      const token = sessionStorage.getItem('aniverse_github_pat') || localStorage.getItem('aniverse_github_pat');
       if (!token) {
         pendingGitHubSync = { mode: 'single', animeId, title };
         const modal = document.getElementById('github-token-modal');
@@ -1065,7 +1077,7 @@
     window.syncAnimeToProduction = syncAnimeToProduction;
 
     async function syncAllAnimesToProduction() {
-      const token = localStorage.getItem('aniverse_github_pat');
+      const token = sessionStorage.getItem('aniverse_github_pat') || localStorage.getItem('aniverse_github_pat');
       if (!token) {
         pendingGitHubSync = { mode: 'all' };
         const modal = document.getElementById('github-token-modal');
@@ -1083,7 +1095,8 @@
         alert("Lütfen geçerli bir GitHub Token (ghp_... veya github_pat_...) giriniz!");
         return;
       }
-      localStorage.setItem('aniverse_github_pat', token);
+      // Güvenlik gereği kalıcı disk (localStorage) yerine geçici hafızada (sessionStorage) saklanır
+      sessionStorage.setItem('aniverse_github_pat', token);
       closeGitHubModal();
 
       if (!pendingGitHubSync) return;
@@ -1107,6 +1120,7 @@
 
         if (!getRes.ok) {
           if (getRes.status === 401 || getRes.status === 403) {
+            sessionStorage.removeItem('aniverse_github_pat');
             localStorage.removeItem('aniverse_github_pat');
             throw new Error("GitHub Token yetkisiz veya süresi dolmuş!");
           }
