@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/Home/SpeedTest", "destination": "/speedtest.html" },
+    { "source": "/speedtest", "destination": "/speedtest.html" }
+  ]
+}
