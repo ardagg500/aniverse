@@ -17,6 +17,66 @@ const mockData = {
   // ── All Anime Database (Uyduruk stock animeler temizlendi) ──
   animes: [
     {
+    "id": 1782433904470,
+    "title": "Smoking Behind the Supermarket with You",
+    "titleJp": "Smoking Behind the Supermarket with You",
+    "image": "https://wsrv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw300%2FgHVfuuOXPVs0ltFbOZQjxpXtSSH.jpg",
+    "banner": "https://wsrv.nl/?url=https%3A%2F%2Fimage.tmdb.org%2Ft%2Fp%2Fw300%2FgHVfuuOXPVs0ltFbOZQjxpXtSSH.jpg",
+    "description": "Smoking Behind the Supermarket with You efsanesi AniVerse platformunda.",
+    "genres": [
+        "Aksiyon",
+        "Macera",
+        "Fantastik"
+    ],
+    "rating": 8.8,
+    "year": 2026,
+    "season": "Bahar",
+    "status": "Devam Ediyor",
+    "studio": "AniVerse Studio",
+    "totalEpisodes": 6,
+    "popularity": 90,
+    "isNew": true,
+    "quality": "1080p",
+    "episodes": [
+        {
+            "number": 1,
+            "title": "1. Bölüm",
+            "duration": "24:00",
+            "embedUrl": "https://tau-video.xyz/embed/6a25f9ea2b34b506938a4106?vid=755569"
+        },
+        {
+            "number": 2,
+            "title": "2. Bölüm",
+            "duration": "24:00",
+            "embedUrl": "https://tau-video.xyz/embed/6a274934048010175ef9e0e7?vid=755655"
+        },
+        {
+            "number": 3,
+            "title": "3. Bölüm",
+            "duration": "24:00",
+            "embedUrl": "https://tau-video.xyz/embed/6a29844f2b34b506938a4112?vid=755835"
+        },
+        {
+            "number": 4,
+            "title": "4. Bölüm",
+            "duration": "24:00",
+            "embedUrl": "https://tau-video.xyz/embed/6a29a80451d1bc8abb9fa49b?vid=755853"
+        },
+        {
+            "number": 5,
+            "title": "5. Bölüm",
+            "duration": "24:00",
+            "embedUrl": "https://tau-video.xyz/embed/6a2b0b1d2b34b506938a4117?vid=755898"
+        },
+        {
+            "number": 6,
+            "title": "6. Bölüm",
+            "duration": "24:00",
+            "embedUrl": "https://tau-video.xyz/embed/6a2b3b60048010175ef9e0f2?vid=755904"
+        }
+    ]
+},
+    {
       id: 111,
       title: "Sınıfımın En Güzel İkinci Kızıyla Arkadaş Oldum",
       titleJp: "I Made Friends with the Second Prettiest Girl in My Class",
