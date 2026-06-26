@@ -7,6 +7,13 @@ const mockData = {
   heroSlides: [
     {
       id: 1,
+      animeId: 222,
+      tagline: "Bahar Sezonu • ★ 8.8",
+      ctaText: "Hemen İzle",
+      banner: "assets/smoking_banner.png"
+    },
+    {
+      id: 2,
       animeId: 111,
       tagline: "Yeni Bölüm Yayında",
       ctaText: "Hemen İzle",
@@ -14,8 +21,34 @@ const mockData = {
     }
   ],
 
-  // ── All Anime Database (Uyduruk stock animeler temizlendi) ──
+  // ── All Anime Database ──
   animes: [
+    {
+      id: 222,
+      title: "Smoking Behind the Supermarket with You",
+      titleJp: "Super no Ura de Yani Suu Futari",
+      image: "assets/smoking_poster.png",
+      banner: "assets/smoking_banner.png",
+      description: "Smoking Behind the Supermarket with You efsanesi AniVerse platformunda. Yorgun bir iş gününün ardından süpermarketin arkasında tanışan ikilinin iç ısıtan hikayesi.",
+      genres: ["Yaşamdan Kesitler", "Romantik", "Komedi"],
+      rating: 8.8,
+      year: 2026,
+      season: "Bahar",
+      status: "Devam Ediyor",
+      studio: "AniVerse Studio",
+      totalEpisodes: 12,
+      popularity: 92,
+      isNew: true,
+      quality: "1080p",
+      episodes: [
+        { 
+          number: 1, 
+          title: "1. Bölüm", 
+          duration: "24:00", 
+          embedUrl: "https://tau-video.xyz/embed/69d5763298be3e47efffd7fd?vid=749135" 
+        }
+      ]
+    },
     {
       id: 111,
       title: "Sınıfımın En Güzel İkinci Kızıyla Arkadaş Oldum",
