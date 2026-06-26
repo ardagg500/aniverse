@@ -550,6 +550,35 @@
     </div>
   </div>
 
+  <!-- GitHub REST API Token Onay Modalı -->
+  <div id="github-token-modal" class="custom-modal-overlay" style="display: none;">
+    <div class="custom-modal-box" style="max-width: 500px; text-align: left;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+        <span style="font-size:2rem; filter: drop-shadow(0 0 10px rgba(16,185,129,0.5));">🔐</span>
+        <div>
+          <h3 class="modal-title" style="margin:0; font-size:1.3rem; color:white;">GitHub Uzaktan Bağlantı Yetkisi</h3>
+          <span style="color:#10b981; font-size:0.78rem;">REST API Repository Push Entegrasyonu</span>
+        </div>
+      </div>
+      <p class="modal-text" style="text-align:left; font-size:0.88rem; margin-bottom:18px;">
+        Canlı GitHub Pages depomuzda (<b>ardagg500/aniverse</b>) uzaktan dosya kod commit'i atabilmek için repo yazma yetkisi olan bir GitHub Personal Access Token (PAT) giriniz. Bu token yalnızca tarayıcınızın güvenli hafızasında saklanır.
+      </p>
+      <div style="margin-bottom:20px;">
+        <label style="display:block; color:var(--text-secondary); font-size:0.82rem; font-weight:700; margin-bottom:6px;">GitHub Token (ghp_... / github_pat_...)</label>
+        <input type="password" id="github-pat-input" placeholder="github_pat_11A..." style="width:100%; padding:12px 14px; background:#121216; border:1px solid rgba(16,185,129,0.4); border-radius:10px; color:white; font-family:monospace; font-size:0.88rem; outline:none;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='rgba(16,185,129,0.4)'">
+        <p style="color:var(--text-tertiary); font-size:0.75rem; margin-top:8px; margin-bottom:0;">
+          💡 GitHub &gt; Settings &gt; Developer settings &gt; Personal access tokens kısmından <b>Contents: Read &amp; write</b> yetkili token oluşturabilirsiniz.
+        </p>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:12px;">
+        <button type="button" class="btn btn-ghost" onclick="closeGitHubModal()" style="padding:10px 18px; border-radius:10px;">Vazgeç</button>
+        <button type="button" class="btn" onclick="executeGitHubRestApiPush()" style="background:linear-gradient(135deg, #10b981, #06b6d4); color:#000; font-weight:700; padding:10px 20px; border-radius:10px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(16,185,129,0.4);">
+          🚀 Canlı Depoya Yaz ve Yayınla
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/data.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/components.js"></script>
@@ -995,60 +1024,188 @@
       renderActiveScheduleList();
     });
 
-    // --- LIVE PRODUCTION SYNC (HTTP POST) ---
-    async function syncAnimeToProduction(animeId, title) {
-      const animes = typeof getAnimes === 'function' ? getAnimes() : [];
-      const anime = animes.find(a => String(a.id) === String(animeId));
-      if (!anime) return;
+    // --- GITHUB REST API REMOTE PUSH TRANSFER ---
+    let pendingGitHubSync = null;
 
-      showSyncToast(`⏳ "${title}" Canlı Sunucuya Gönderiliyor... (POST /api/admin/sync-anime)`, true);
-
-      const payload = {
-        title: anime.title,
-        coverUrl: anime.image || anime.banner || "",
-        seasons: anime.seasons || 2,
-        episodes: (anime.episodes || []).map((ep, idx) => ({
-          season: ep.season || 1,
-          episodeNumber: parseInt(ep.number || idx + 1),
-          videoUrl: ep.src || ""
-        }))
-      };
-
-      const targetEndpoint = localStorage.getItem('aniverse_live_sync_endpoint') || '/api/admin/sync-anime';
-
-      try {
-        const res = await fetch(targetEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Sync-Key': localStorage.getItem('aniverse_sync_secret') || 'AniVerse_Production_Secret_2026'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (res.ok) {
-          showSyncToast(`🚀 Başarılı! "${title}" Canlı Site Veri Tabanına Yazıldı!`, false);
-        } else {
-          throw new Error("HTTP " + res.status);
-        }
-      } catch (err) {
-        // Statik barındırmada (GitHub Pages 404 vb) Canlı Yayın Senkronizasyon Kanalını simüle et
-        localStorage.setItem('production_synced_' + anime.id, JSON.stringify(payload));
-        showSyncToast(`🚀 Başarıyla Canlıya Gönderildi! "${title}" tüm platformda yayında!`, false);
+    function decodeGitHubBase64(base64) {
+      const binaryString = window.atob(base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
+      return new TextDecoder().decode(bytes);
+    }
+
+    function encodeGitHubBase64(text) {
+      const bytes = new TextEncoder().encode(text);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return window.btoa(binary);
+    }
+
+    function closeGitHubModal() {
+      pendingGitHubSync = null;
+      const modal = document.getElementById('github-token-modal');
+      if (modal) modal.style.display = 'none';
+    }
+    window.closeGitHubModal = closeGitHubModal;
+
+    async function syncAnimeToProduction(animeId, title) {
+      const token = localStorage.getItem('aniverse_github_pat');
+      if (!token) {
+        pendingGitHubSync = { mode: 'single', animeId, title };
+        const modal = document.getElementById('github-token-modal');
+        if (modal) modal.style.display = 'flex';
+        return;
+      }
+      await pushToGitHubRestApi('single', animeId, title, token);
     }
     window.syncAnimeToProduction = syncAnimeToProduction;
 
     async function syncAllAnimesToProduction() {
-      showSyncToast(`⏳ Tüm yerel içerikler canlı üretim sunucusuna aktarılıyor...`, true);
-      const animes = typeof getAnimes === 'function' ? getAnimes() : [];
-      for (const a of animes) {
-        await new Promise(r => setTimeout(r, 350));
-        localStorage.setItem('production_synced_' + a.id, 'true');
+      const token = localStorage.getItem('aniverse_github_pat');
+      if (!token) {
+        pendingGitHubSync = { mode: 'all' };
+        const modal = document.getElementById('github-token-modal');
+        if (modal) modal.style.display = 'flex';
+        return;
       }
-      showSyncToast(`🌐 Mükemmel! Toplam ${animes.length} Anime Başarıyla Canlıya Gönderildi!`, false);
+      await pushToGitHubRestApi('all', null, "Tüm Yerel İçerikler", token);
     }
     window.syncAllAnimesToProduction = syncAllAnimesToProduction;
+
+    async function executeGitHubRestApiPush() {
+      const inputEl = document.getElementById('github-pat-input');
+      const token = inputEl ? inputEl.value.trim() : '';
+      if (!token) {
+        alert("Lütfen geçerli bir GitHub Token (ghp_... veya github_pat_...) giriniz!");
+        return;
+      }
+      localStorage.setItem('aniverse_github_pat', token);
+      closeGitHubModal();
+
+      if (!pendingGitHubSync) return;
+      const { mode, animeId, title } = pendingGitHubSync;
+      await pushToGitHubRestApi(mode, animeId, title || "İçerik", token);
+    }
+    window.executeGitHubRestApiPush = executeGitHubRestApiPush;
+
+    async function pushToGitHubRestApi(mode, animeId, title, token) {
+      showSyncToast(`⏳ Canlı GitHub deposuna (ardagg500/aniverse) bağlanılıyor...`, true);
+
+      const apiUrl = 'https://api.github.com/repos/ardagg500/aniverse/contents/js/data.js';
+
+      try {
+        const getRes = await fetch(apiUrl, {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+
+        if (!getRes.ok) {
+          if (getRes.status === 401 || getRes.status === 403) {
+            localStorage.removeItem('aniverse_github_pat');
+            throw new Error("GitHub Token yetkisiz veya süresi dolmuş!");
+          }
+          throw new Error("GitHub deponuza ulaşılamadı (HTTP " + getRes.status + ")");
+        }
+
+        const fileInfo = await getRes.json();
+        const currentSha = fileInfo.sha;
+        const currentContent = decodeGitHubBase64(fileInfo.content);
+
+        const localAnimes = typeof getAnimes === 'function' ? getAnimes() : [];
+        let toInject = [];
+
+        if (mode === 'single') {
+          const found = localAnimes.find(a => String(a.id) === String(animeId));
+          if (found) toInject.push(found);
+        } else {
+          toInject = localAnimes;
+        }
+
+        if (toInject.length === 0) throw new Error("Aktarılacak içerik bulunamadı.");
+
+        let newContent = currentContent;
+        let addedCount = 0;
+
+        for (const anime of toInject) {
+          if (newContent.includes(`"id": ${anime.id}`) || newContent.includes(`id: ${anime.id}`)) {
+            continue;
+          }
+
+          const targetMarker = 'animes: [';
+          const insertIdx = newContent.indexOf(targetMarker);
+          if (insertIdx === -1) throw new Error("data.js dosya yapısı okunamadı.");
+
+          const before = newContent.substring(0, insertIdx + targetMarker.length);
+          const after = newContent.substring(insertIdx + targetMarker.length);
+
+          const cleanAnime = {
+            id: anime.id,
+            title: anime.title,
+            titleJp: anime.titleJp || "",
+            image: anime.image || "assets/logo.svg",
+            banner: anime.banner || anime.image || "assets/logo.svg",
+            description: anime.description || "Yeni efsane AniVerse platformunda.",
+            genres: anime.genres || ["Romantik", "Yaşamdan Kesitler"],
+            rating: anime.rating || 8.8,
+            year: 2026,
+            season: anime.season || "Bahar",
+            status: "Devam Ediyor",
+            studio: "AniVerse Studio",
+            totalEpisodes: anime.episodes ? anime.episodes.length : 1,
+            popularity: 90,
+            isNew: true,
+            quality: "1080p",
+            episodes: anime.episodes || []
+          };
+
+          const formatted = JSON.stringify(cleanAnime, null, 4);
+          newContent = before + '\n    ' + formatted + ',' + after;
+          addedCount++;
+        }
+
+        if (addedCount === 0) {
+          showSyncToast(`ℹ️ Seçilen içerik(ler) zaten canlı veri tabanında yayında!`, false);
+          return;
+        }
+
+        showSyncToast(`⏳ GitHub commit kodu oluşturulup canlı depoya yazılıyor...`, true);
+
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify({
+            message: `feat(admin): "${title}" animesi doğrudan GitHub REST API ile canlıya yayımlandı`,
+            content: encodeGitHubBase64(newContent),
+            sha: currentSha,
+            branch: 'main'
+          })
+        });
+
+        if (!putRes.ok) {
+          const errBody = await putRes.json().catch(() => ({}));
+          throw new Error("GitHub Yazma Hatası: " + (errBody.message || putRes.statusText));
+        }
+
+        showSyncToast(`🚀 Başarılı! "${title}" canlı sitemize commit edildi!`, false);
+        setTimeout(() => {
+          alert(`🎉 Muazzam! "${title}" doğrudan ardagg500/aniverse canlı GitHub deposuna kodlandı.\n\n⏳ GitHub Pages derleme süresi gereği 1-2 dakika içinde canlı sitenizi yenilediğinizde tüm dünyada gözükecektir!`);
+        }, 500);
+
+      } catch (err) {
+        showSyncToast(`❌ Hata: ${err.message}`, false);
+        alert(`Canlıya Aktarma Başarısız:\n\n${err.message}\n\nLütfen GitHub Token yetkisini kontrol edin.`);
+      }
+    }
 
     function showSyncToast(msg, isLoading) {
       let toast = document.getElementById('sync-status-toast');
