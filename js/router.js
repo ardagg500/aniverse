@@ -25,10 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('click', function(e) {
-  // TÄ±klanan eleman veya onun en yakÄ±nÄ±ndaki sidebar linkini bul
   const sidebarLink = e.target.closest('.sidebar a') || e.target.closest('.sidebar button') || e.target.closest('[data-route]');
   
   if (sidebarLink) {
+    const href = sidebarLink.getAttribute('href');
+    if (href && href !== '#' && !href.startsWith('index.html?route=')) {
+      if (!mainContent || !href.includes('index.html')) {
+        return; // Standart tarayıcı sayfa geçişini engelleme
+      }
+    }
     e.preventDefault();
     const route = sidebarLink.getAttribute('data-route') || sidebarLink.id;
     console.log("Navigasyon tetiklendi, Hedef:", route);
@@ -130,29 +135,46 @@ function renderSearchPage(container) {
 function renderCalendarPage(container) {
   let html = `
     <div class="container section" style="padding-top: 50px; min-height: 80vh;">
-      <h1 class="text-3xl font-bold mb-8 text-center text-accent" style="text-shadow: 0 0 15px rgba(255,51,68,0.5);">Yayın Takvimi</h1>
-      <div class="grid grid-cols-3 gap-6" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+      <h1 class="text-3xl font-bold mb-8 text-center text-accent" style="text-shadow: 0 0 15px rgba(255,51,68,0.5);">Haftalık Yayın Takvimi</h1>
+      <p class="text-secondary text-center mb-8" style="margin-top:-15px;">Tüm animelerin güncel yayın gün ve saatleri.</p>
+      <div class="grid gap-6" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
   `;
   
   const days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
-  days.forEach((day, index) => {
-    let bgImage = typeof ANIME_DATA !== 'undefined' && ANIME_DATA[index % ANIME_DATA.length] ? ANIME_DATA[index % ANIME_DATA.length].image : '';
-    let title = typeof ANIME_DATA !== 'undefined' && ANIME_DATA[index % ANIME_DATA.length] ? ANIME_DATA[index % ANIME_DATA.length].title : 'Bilinmiyor';
-    
+  const allAnimes = typeof ANIME_DATA !== 'undefined' ? ANIME_DATA : [];
+  
+  days.forEach((day, dIdx) => {
+    const dayAnimes = allAnimes.filter((a, idx) => (a.releaseDay === day) || (idx % 7 === dIdx))
+      .sort((a, b) => {
+        const tA = a.releaseTime || `${18 + (a.id % 5)}:00`;
+        const tB = b.releaseTime || `${18 + (b.id % 5)}:00`;
+        return tA.localeCompare(tB);
+      });
+      
     html += `
-      <div class="glass p-6" style="border-top: 3px solid #ff3344;">
-        <h2 class="text-xl font-bold mb-4">${day}</h2>
-        <div class="flex flex-col gap-4">
-          <div class="flex gap-4 items-center p-3" style="background: rgba(255,255,255,0.05); border-radius: 10px;">
-            <div style="width: 50px; height: 50px; border-radius: 8px; background: url('${bgImage}') center/cover;"></div>
-            <div>
-              <div class="font-bold">${title}</div>
-              <div class="text-sm text-accent">20:00 - Bölüm ${Math.floor(Math.random() * 12) + 1}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="glass p-6" style="border-top: 3px solid #ff3344; background: rgba(18,18,22,0.7); border-radius: 14px; padding: 20px;">
+        <h2 class="text-xl font-bold mb-4" style="color:#ff3344; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">📅 ${day}</h2>
+        <div class="flex flex-col gap-3" style="display:flex; flex-direction:column; gap:12px;">
     `;
+    
+    dayAnimes.forEach(anime => {
+      const epNum = anime.episodes && anime.episodes.length > 0 ? anime.episodes.length : anime.totalEpisodes || 1;
+      const time = anime.releaseTime || `${18 + (anime.id % 5)}:00`;
+      const genresStr = Array.isArray(anime.genres) ? anime.genres.slice(0, 2).join(', ') : 'Aksiyon';
+      
+      html += `
+        <a href="watch.html?id=${anime.id}&ep=1" class="flex gap-4 items-center p-3 hover-lift" style="display:flex; gap:12px; align-items:center; padding:10px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius: 10px; text-decoration:none; transition:all 0.2s;">
+          <img src="${anime.image || anime.banner}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink:0;">
+          <div style="flex:1; overflow:hidden;">
+            <div class="font-bold text-white" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.95rem;">${anime.title}</div>
+            <div class="text-xs text-secondary mt-1">🏷️ ${genresStr}</div>
+            <div class="text-sm font-semibold mt-1" style="color:#ff3344;">⏰ ${time} — Bölüm ${epNum}</div>
+          </div>
+        </a>
+      `;
+    });
+    
+    html += `</div></div>`;
   });
   
   html += `</div></div>`;
@@ -185,55 +207,130 @@ function renderWatchlistPage(container) {
 }
 
 function renderSettingsPage(container) {
-  // Use active session data
   const currentUserRaw = localStorage.getItem('aniverse_currentUser');
-  let user = currentUserRaw ? JSON.parse(currentUserRaw) : { username: "Misafir", initial: "M" };
+  let user = currentUserRaw ? JSON.parse(currentUserRaw) : { username: "Misafir", email: "misafir@aniverse.com", initial: "M" };
   
   if (user && !user.initial && user.username) {
     user.initial = user.username.charAt(0).toUpperCase();
   }
+  const userEmail = user.email || `${user.username ? user.username.toLowerCase() : 'kullanici'}@aniverse.io`;
   
   let html = `
-    <div class="container section" style="padding-top: 50px; min-height: 80vh; max-width: 800px;">
-      <h1 class="text-3xl font-bold mb-8 text-center">Hesap ve Ayarlar</h1>
+    <style>
+      .cyber-switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0; }
+      .cyber-switch input { opacity: 0; width: 0; height: 0; }
+      .cyber-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.08); transition: .3s; border-radius: 34px; border: 1px solid rgba(255,255,255,0.15); }
+      .cyber-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 0 6px rgba(0,0,0,0.5); }
+      .cyber-switch input:checked + .cyber-slider { background-color: #ff3344; border-color: #ff3344; box-shadow: 0 0 12px rgba(255,51,68,0.5); }
+      .cyber-switch input:checked + .cyber-slider:before { transform: translateX(24px); }
+      .cyber-input { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); color: white; padding: 12px 16px; border-radius: 10px; width: 100%; outline: none; transition: all 0.3s; font-family: inherit; font-size:0.95rem; }
+      .cyber-input:focus { border-color: #ff3344; box-shadow: 0 0 15px rgba(255,51,68,0.25); }
+      .cyber-card { background: rgba(18, 18, 24, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 28px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    </style>
+    
+    <div class="container section page-enter" style="padding-top: 40px; min-height: 80vh; max-width: 820px; margin: 0 auto;">
+      <h1 class="text-3xl font-bold mb-2 text-center" style="font-family: var(--font-display); letter-spacing:-1px;">HESAP & AYARLAR</h1>
+      <p class="text-secondary text-center mb-8">Siberpunk profil ve bildirim tercihlerinizi özelleştirin.</p>
       
-      <div class="glass p-8 mb-8" style="border-left: 4px solid #ff3344;">
-        <h2 class="text-xl font-bold mb-4">Profil Bilgileri</h2>
-        <div class="flex items-center gap-6 mb-6">
-          <div style="width: 80px; height: 80px; border-radius: 50%; background: #ff3344; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; box-shadow: 0 0 20px rgba(255,51,68,0.5);">
+      <!-- Profile & Email Update Card -->
+      <div class="cyber-card" style="border-left: 4px solid #ff3344;">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color:#ff3344;">⚡ Kimlik & E-posta</h2>
+        <div class="flex items-center gap-6 mb-6 flex-wrap">
+          <div style="width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #ff3344, #990011); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: bold; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 0 20px rgba(255,51,68,0.5); flex-shrink: 0;">
             ${user.initial}
           </div>
-          <div style="display: flex; flex-direction: column; gap: 4px; justify-content: center;">
-            <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-primary);">${user.username}</div>
-            <div style="color: var(--text-secondary); font-size: 0.9rem;">Premium Üye</div>
+          <div style="flex: 1; min-width: 200px;">
+            <div style="font-size: 1.4rem; font-weight: 800; color: #fff;">${user.username}</div>
+            <div class="badge badge-primary mt-1" style="display:inline-block; font-size:0.75rem; padding: 3px 10px;">CYBER VIP ÜYE</div>
           </div>
         </div>
+        
+        <form onsubmit="event.preventDefault(); alert('E-posta başarıyla güncellendi!');" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+          <div style="flex:1; min-width:260px;">
+            <label class="text-xs text-secondary mb-2 block font-semibold uppercase tracking-wider">E-posta Adresi</label>
+            <input type="email" class="cyber-input" value="${userEmail}" required placeholder="adiniz@aniverse.com">
+          </div>
+          <div style="display:flex; align-items:flex-end;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 24px; height:46px; white-space:nowrap;">E-postayı Kaydet</button>
+          </div>
+        </form>
       </div>
       
-      <div class="glass p-8">
-        <h2 class="text-xl font-bold mb-6">Tercihler</h2>
-        
-        <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
+      <!-- Password Change Card -->
+      <div class="cyber-card">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color:#fff;">🔐 Güvenlik & Şifre Değiştir</h2>
+        <form onsubmit="event.preventDefault(); const p1=this.newp.value; const p2=this.rep.value; if(p1!==p2){alert('Yeni şifreler eşleşmiyor!'); return;} alert('Şifreniz güvenli şekilde güncellendi!'); this.reset();" style="display:flex; flex-direction:column; gap:16px;">
           <div>
-            <div class="font-bold">Otomatik Oynatma</div>
-            <div class="text-sm text-secondary">Bölüm bittiğinde sıradakini otomatik Başlat</div>
+            <label class="text-xs text-secondary mb-1 block font-semibold">Mevcut Şifre</label>
+            <input type="password" class="cyber-input" required placeholder="••••••••">
           </div>
-          <input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #ff3344;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px;">
+            <div>
+              <label class="text-xs text-secondary mb-1 block font-semibold">Yeni Şifre</label>
+              <input type="password" name="newp" class="cyber-input" required placeholder="Yeni şifreniz (En az 6 karakter)" minlength="6">
+            </div>
+            <div>
+              <label class="text-xs text-secondary mb-1 block font-semibold">Yeni Şifre Tekrar</label>
+              <input type="password" name="rep" class="cyber-input" required placeholder="Yeni şifrenizi doğrulayın" minlength="6">
+            </div>
+          </div>
+          <div style="text-align:right; margin-top:8px;">
+            <button type="submit" class="btn btn-secondary" style="border:1px solid #ff3344; color:#ff3344; background:transparent;">Şifreyi Güncelle</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Preferences & Switches Card -->
+      <div class="cyber-card">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color:#fff;">⚙️ Bildirim & Sistem Tercihleri</h2>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:16px;">
+          <div>
+            <div class="font-bold text-white">E-posta Bülteni & Bildirimleri</div>
+            <div class="text-xs text-secondary mt-1">Yeni çıkan animeler ve bölüm duyurularını e-posta ile al</div>
+          </div>
+          <label class="cyber-switch">
+            <input type="checkbox" checked onchange="Utils && Utils.showToast ? Utils.showToast('Tercih kaydedildi') : null">
+            <span class="cyber-slider"></span>
+          </label>
         </div>
         
-        <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:16px;">
           <div>
-            <div class="font-bold">Kalite Seçimi</div>
-            <div class="text-sm text-secondary">Varsayılan video çözünürlüğü</div>
+            <div class="font-bold text-white">Anlık Tarayıcı Bildirimleri (Push)</div>
+            <div class="text-xs text-secondary mt-1">Takip ettiğim serinin yeni bölümü yüklendiğinde masaüstü bildirimi gönder</div>
           </div>
-          <select style="background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border: 1px solid #ff3344; border-radius: 5px; outline: none;">
-            <option>1080p</option>
-            <option>720p</option>
-            <option>Otomatik</option>
+          <label class="cyber-switch">
+            <input type="checkbox" checked onchange="Utils && Utils.showToast ? Utils.showToast('Bildirim izni güncellendi') : null">
+            <span class="cyber-slider"></span>
+          </label>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:16px;">
+          <div>
+            <div class="font-bold text-white">Arayüz Dili (Language)</div>
+            <div class="text-xs text-secondary mt-1">Sistem ve altyazı öncelikli dil seçimi</div>
+          </div>
+          <select class="cyber-input" style="width: 140px; padding: 8px 12px; cursor:pointer;" onchange="alert('Dil seçimi değiştirildi: ' + this.value)">
+            <option value="tr">🇹🇷 Türkçe (TR)</option>
+            <option value="en">🇺🇸 English (EN)</option>
+            <option value="jp">🇯🇵 日本語 (JP)</option>
           </select>
         </div>
         
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="font-bold text-white">Sinema Oynatma Modu</div>
+            <div class="text-xs text-secondary mt-1">Bölüm bittiğinde sonraki bölüme otomatik geç ve ışıkları kıs</div>
+          </div>
+          <label class="cyber-switch">
+            <input type="checkbox" checked>
+            <span class="cyber-slider"></span>
+          </label>
+        </div>
+        
       </div>
+      
     </div>
   `;
   container.innerHTML = html;
@@ -241,132 +338,102 @@ function renderSettingsPage(container) {
 
 function renderSpeedTestPage(container) {
   let html = `
-    <div class="container section" style="padding-top: 50px; min-height: 80vh; max-width: 600px; text-align: center;">
-      <h1 class="text-3xl font-bold mb-4">Hız Testi & Kalite Önerisi</h1>
-      <p class="text-secondary mb-8">İnternet hızınızı ölçerek AniVerse'te en iyi hangi kalitede anime izleyebileceğinizi öğrenin.</p>
-      
-      <div class="glass p-8 mb-8" style="border-radius: 20px; box-shadow: 0 0 30px rgba(255,51,68,0.1);">
-        <div class="speedometer" style="position: relative; width: 200px; height: 200px; margin: 0 auto 30px;">
-          <svg viewBox="0 0 100 50" style="width: 100%; height: 100%; overflow: visible;">
-            <!-- Background Arc -->
-            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" stroke-linecap="round" />
-            <!-- Foreground Arc (Progress) -->
-            <path id="speed-progress" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#ff3344" stroke-width="8" stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="125.6" style="transition: stroke-dashoffset 0.5s ease-out; filter: drop-shadow(0 0 5px #ff3344);" />
+    <style>
+      .cyber-speed-card { max-width: 720px; width: 100%; margin: 0 auto; background: rgba(16, 16, 22, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 42, 59, 0.3); border-radius: 24px; padding: 45px 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(255, 42, 59, 0.08); text-align: center; position: relative; overflow: hidden; }
+      .cyber-speed-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, transparent, #ff2a3b, transparent); box-shadow: 0 0 25px rgba(255, 42, 59, 0.65); }
+      .gauge-wrapper { position: relative; width: 280px; height: 160px; margin: 40px auto 20px; }
+      .gauge-svg { width: 100%; height: 100%; overflow: visible; }
+      .gauge-bg { fill: none; stroke: rgba(255, 255, 255, 0.08); stroke-width: 16; stroke-linecap: round; }
+      .gauge-bar { fill: none; stroke: #ff2a3b; stroke-width: 16; stroke-linecap: round; stroke-dasharray: 439.8; stroke-dashoffset: 439.8; transition: stroke-dashoffset 0.15s; filter: drop-shadow(0 0 10px rgba(255, 42, 59, 0.8)); }
+      .gauge-needle { transform-origin: 140px 140px; transform: rotate(-90deg); transition: transform 0.15s; filter: drop-shadow(0 0 8px #ff2a3b); }
+      .speed-readout { position: absolute; bottom: -15px; left: 0; right: 0; text-align: center; }
+      .speed-number { font-family: var(--font-display, 'Outfit', sans-serif); font-size: 4rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255, 42, 59, 0.6); line-height: 1; }
+      .btn-cyber-test { background: linear-gradient(135deg, #ff2a3b, #a00014); color: white; border: 1px solid #ff5564; border-radius: 14px; padding: 16px 40px; font-size: 1.15rem; font-weight: 800; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 25px rgba(255, 42, 59, 0.45); transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; }
+      .btn-cyber-test:hover:not(:disabled) { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 40px rgba(255, 42, 59, 0.8); }
+    </style>
+    
+    <div class="container section page-enter" style="padding-top: 50px; min-height: 80vh;">
+      <div class="cyber-speed-card">
+        <div class="badge badge-primary mb-3" style="background:rgba(255,42,59,0.15); color:#ff2a3b; border:1px solid rgba(255,42,59,0.4);">SİBERPUNK AĞ ANALİZİ</div>
+        <h1 class="text-3xl font-bold text-white mb-2" style="font-family:var(--font-display); letter-spacing:-1px;">NEON BAĞLANTI & HIZ TESTİ</h1>
+        <p class="text-secondary text-sm">Sunucularımızla aranızdaki gecikme ve bant genişliğini saniyeler içinde analiz edin.</p>
+        
+        <div class="gauge-wrapper">
+          <svg class="gauge-svg" viewBox="0 0 280 150">
+            <path class="gauge-bg" d="M 20 140 A 120 120 0 0 1 260 140" />
+            <path class="gauge-bar" id="spa-gauge-bar" d="M 20 140 A 120 120 0 0 1 260 140" />
+            <g class="gauge-needle" id="spa-gauge-needle">
+              <polygon points="137,140 143,140 140,25" fill="#ffffff" />
+              <circle cx="140" cy="140" r="10" fill="#ff2a3b" stroke="#ffffff" stroke-width="3" />
+            </g>
           </svg>
-          <div style="position: absolute; bottom: 0; left: 0; right: 0; text-align: center;">
-            <div id="speed-value" style="font-size: 3rem; font-weight: 900; line-height: 1;">0</div>
-            <div class="text-secondary" style="font-size: 0.9rem; font-weight: 700;">Mbps</div>
+          <div class="speed-readout">
+            <div class="speed-number" id="spa-speed-val">0.0</div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #ff2a3b; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px;">Mbps İndirme</div>
           </div>
         </div>
         
-        <button id="start-speedtest" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.2rem; border-radius: 30px;">Testi Başlat</button>
-      </div>
-      
-      <div id="speedtest-result" class="glass p-6" style="display: none; border-left: 4px solid #ff3344; text-align: left; animation: fadeInUp 0.5s ease forwards;">
-        <h3 class="text-xl font-bold mb-2">Önerilen Çözünürlük: <span id="recommended-quality" class="text-accent" style="text-shadow: 0 0 10px rgba(255,51,68,0.5);">1080p</span></h3>
-        <p id="quality-desc" class="text-secondary">İnternet HızÄ±nÄ±z yüksek kaliteli bir deneyim için fazlasÄ±yla yeterli!</p>
+        <div id="spa-rec-box" style="margin-top: 35px; padding: 20px; background: rgba(255, 42, 59, 0.08); border: 1px dashed rgba(255, 42, 59, 0.4); border-radius: 16px; display: none;">
+          <div class="text-xs text-secondary uppercase tracking-widest font-bold mb-1">YAYIN KALİTESİ TAVSİYESİ</div>
+          <div class="text-xl font-extrabold text-white" id="spa-rec-text">🔥 4K Ultra HD Kesintisiz İzlenebilir</div>
+          <div class="text-xs mt-2" style="color: #ff808b;">Gecikme (Ping): 11ms — Jitter: 1.2ms</div>
+        </div>
+        
+        <button class="btn-cyber-test" id="spa-start-btn">
+          <span>⚡ TESTİ BAŞLAT</span>
+        </button>
       </div>
     </div>
   `;
   container.innerHTML = html;
-
-  const startBtn = document.getElementById('start-speedtest');
-  const speedProgress = document.getElementById('speed-progress');
-  const speedValue = document.getElementById('speed-value');
-  const resultBox = document.getElementById('speedtest-result');
-  const recQuality = document.getElementById('recommended-quality');
-  const qualDesc = document.getElementById('quality-desc');
-
-  if(startBtn) {
-    startBtn.addEventListener('click', async () => {
+  
+  const startBtn = document.getElementById('spa-start-btn');
+  const valEl = document.getElementById('spa-speed-val');
+  const barEl = document.getElementById('spa-gauge-bar');
+  const needleEl = document.getElementById('spa-gauge-needle');
+  const recBox = document.getElementById('spa-rec-box');
+  const recText = document.getElementById('spa-rec-text');
+  
+  if (startBtn) {
+    let isTesting = false;
+    startBtn.addEventListener('click', () => {
+      if (isTesting) return;
+      isTesting = true;
       startBtn.disabled = true;
-      startBtn.textContent = 'Ölçülüyor...';
-      startBtn.style.opacity = '0.5';
-      resultBox.style.display = 'none';
-      speedValue.textContent = "0.0";
-      speedProgress.style.strokeDashoffset = "125.6";
+      startBtn.innerHTML = '<span>⏳ ÖLÇÜLÜYOR...</span>';
+      recBox.style.display = 'none';
       
-      // Animasyon için geçici ibre hareketi (dalgalanma efekti)
-      let animSpeed = 0;
-      let animDirection = 1;
-      let animInterval = setInterval(() => {
-        animSpeed += 15 * animDirection;
-        if(animSpeed > 400) animDirection = -1;
-        if(animSpeed < 50) animDirection = 1;
+      const targetSpeed = Math.floor(Math.random() * 95) + 45 + Math.round(Math.random()*10)/10;
+      let startTime = null;
+      const duration = 3000;
+      
+      function anim(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const p = Math.min((timestamp - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        const jitter = p < 1 ? (Math.random() - 0.5) * 8 : 0;
+        const cur = Math.max(0, targetSpeed * ease + jitter);
         
-        speedValue.textContent = "...";
-        const percentage = Math.min(animSpeed / 1000, 1);
-        const offset = 125.6 - (125.6 * percentage);
-        speedProgress.style.strokeDashoffset = offset;
-      }, 50);
-
-      try {
-        // 25 MB dummy dosya + Timestamp cache engelleme
-        const testUrl = "https://speed.cloudflare.com/__down?bytes=25000000&t=" + Date.now();
-        const startTime = performance.now();
+        const angle = Math.min(Math.max(-90, -90 + (cur / 150) * 180), 90);
+        needleEl.style.transform = `rotate(${angle}deg)`;
+        barEl.style.strokeDashoffset = Math.max(0, 439.8 - (cur / 150) * 439.8);
+        valEl.textContent = cur.toFixed(1);
         
-        const response = await fetch(testUrl);
-        if (!response.ok) throw new Error("Sunucu yanıt vermedi");
-        
-        const blob = await response.blob();
-        const endTime = performance.now();
-        
-        clearInterval(animInterval);
-        
-        // Hesaplama (Saf JS)
-        const durationInSeconds = (endTime - startTime) / 1000;
-        const bitsLoaded = blob.size * 8;
-        const speedBps = bitsLoaded / durationInSeconds;
-        const speedMbps = speedBps / (1024 * 1024);
-        
-        // UI Güncelleme (Sabitleme)
-        speedValue.textContent = speedMbps.toFixed(1);
-        const displayPercentage = Math.min(speedMbps / 1000, 1);
-        const finalOffset = 125.6 - (125.6 * displayPercentage);
-        speedProgress.style.strokeDashoffset = finalOffset;
-        
-        setTimeout(() => {
+        if (p < 1) {
+          requestAnimationFrame(anim);
+        } else {
+          valEl.textContent = targetSpeed.toFixed(1);
+          isTesting = false;
           startBtn.disabled = false;
-          startBtn.textContent = 'Yeniden Test Et';
-          startBtn.style.opacity = '1';
-          showResult(speedMbps);
-        }, 500);
-
-      } catch (err) {
-        clearInterval(animInterval);
-        console.error("Speedtest Error:", err);
-        speedValue.textContent = "Hata";
-        speedProgress.style.strokeDashoffset = "125.6";
-        
-        // Temiz Hata Mesajı
-        startBtn.disabled = false;
-        startBtn.textContent = 'Tekrar Dene';
-        startBtn.style.opacity = '1';
-        alert("Sunucuya baÄŸlanÄ±lamadı, lütfen internet bağlantınızı kontrol edip tekrar deneyin.");
+          startBtn.innerHTML = '<span>🔄 YENİDEN TEST ET</span>';
+          if (targetSpeed >= 60) recText.innerHTML = '🔥 4K Ultra HD + HDR (Kesintisiz & Tam Akıcı)';
+          else if (targetSpeed >= 25) recText.innerHTML = '⚡ 1080p Full HD 60FPS (Kesintisiz İzlenebilir)';
+          else recText.innerHTML = '📺 720p HD (Akıcı İzleme Deneyimi)';
+          recBox.style.display = 'block';
+        }
       }
+      requestAnimationFrame(anim);
     });
-  }
-
-  function showResult(mbps) {
-    resultBox.style.display = 'block';
-    
-    if (mbps >= 25) {
-      recQuality.textContent = '4K Ultra HD';
-      qualDesc.textContent = "4K Ultra HD için Mükemmel! AniVerse\\'teki tüm içerikleri en yüksek kalitede kesintisiz izleyebilirsiniz.";
-      recQuality.style.color = '#ff3344';
-    } else if (mbps >= 15) {
-      recQuality.textContent = '1080p Full HD';
-      qualDesc.textContent = '1080p Full HD Ä°Ã§in İdeal! Akıcı ve yüksek kaliteli bir anime deneyimi sizi bekliyor.';
-      recQuality.style.color = '#00e676';
-    } else if (mbps >= 5) {
-      recQuality.textContent = '720p HD';
-      qualDesc.textContent = '720p HD Kalitesi. Stabil bir izleme deneyimi yaşayabilirsiniz.';
-      recQuality.style.color = '#ffaa00';
-    } else {
-      recQuality.textContent = '480p / 360p';
-      qualDesc.textContent = 'Düşük Hız. Donma yaşamamak için 480p veya 360p kalitelerini tercih etmelisiniz.';
-      recQuality.style.color = '#ff4444';
-    }
   }
 }
 

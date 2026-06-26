@@ -14,11 +14,13 @@ const Components = {
     
     let userHtml = '';
     if (currentUser) {
+      const initChar = currentUser.initial || (currentUser.username ? currentUser.username.charAt(0).toUpperCase() : 'U');
+      const avatarSvg = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="50" fill="#ff3344"/><text x="50" y="56" font-family="Arial, sans-serif" font-weight="bold" font-size="46" fill="white" text-anchor="middle">${initChar}</text></svg>`);
       userHtml = `
-        <a href="profile.html" class="nav-profile-btn" aria-label="Profil" title="${currentUser.username}">
-          <img src="data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'%23ff3344\\'/><text x=\\'50\\' y=\\'50\\' font-family=\\'Arial\\' font-weight=\\'bold\\' font-size=\\'45\\' fill=\\'white\\' text-anchor=\\'middle\\' dy=\\'.35em\\'>${currentUser.initial}</text></svg>" alt="${currentUser.username}">
+        <a href="profile.html" class="nav-profile-btn" aria-label="Profil" title="${currentUser.username}" style="display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; overflow:hidden; border:2px solid #ff3344; box-shadow:0 0 10px rgba(255,51,68,0.4); text-decoration:none; background:#ff3344;">
+          <img src="data:image/svg+xml;utf8,${avatarSvg}" alt="${currentUser.username}" style="width:100%; height:100%; object-fit:cover;" onerror="this.outerHTML='<span style=\\'color:white;font-weight:bold;font-size:1.1rem;\\'>${initChar}</span>'">
         </a>
-        <button onclick="localStorage.removeItem('aniverse_currentUser'); window.location.reload();" title="Çıkış Yap" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 5px;">
+        <button onclick="localStorage.removeItem('aniverse_currentUser'); localStorage.removeItem('isLoggedIn'); window.location.reload();" title="Çıkış Yap" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 5px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
         </button>
       `;
@@ -253,29 +255,32 @@ const Components = {
   // 🌟 Sidebar 🌟
   renderSidebar() {
     const currentPath = window.location.pathname;
-    const isIndex = currentPath.includes('index.html') || currentPath === '/';
+    const isIndex = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/aniverse/');
+    const isSearch = currentPath.includes('search.html');
+    const isProfile = currentPath.includes('profile.html');
+    const isSpeedTest = currentPath.includes('speedtest.html');
     
     return `
       <aside class="sidebar">
         <div class="sidebar-top">
-          <a href="#" class="sidebar-icon ${isIndex ? 'active' : ''}" data-route="home" title="Ana Sayfa">
+          <a href="index.html" class="sidebar-icon ${isIndex ? 'active' : ''}" data-route="home" title="Ana Sayfa">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
           </a>
-          <a href="#" class="sidebar-icon" data-route="search" title="Keşfet / Arama">
+          <a href="search.html" class="sidebar-icon ${isSearch ? 'active' : ''}" data-route="search" title="Keşfet / Arama">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </a>
-          <a href="#" class="sidebar-icon" data-route="calendar" title="Yayın Takvimi">
+          <a href="index.html?route=calendar" class="sidebar-icon" data-route="calendar" title="Yayın Takvimi">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           </a>
-          <a href="#" class="sidebar-icon" data-route="watchlist" title="Koleksiyon / Favoriler">
+          <a href="profile.html" class="sidebar-icon ${isProfile ? 'active' : ''}" data-route="watchlist" title="Koleksiyon / Favoriler">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           </a>
         </div>
         <div class="sidebar-bottom">
-          <a href="#" class="sidebar-icon" data-route="speedtest" title="Hız Testi">
+          <a href="speedtest.html" class="sidebar-icon ${isSpeedTest ? 'active' : ''}" data-route="speedtest" title="Hız Testi">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
           </a>
-          <a href="#" class="sidebar-icon" data-route="settings" title="Ayarlar">
+          <a href="profile.html#tab-settings" class="sidebar-icon" data-route="settings" title="Ayarlar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           </a>
         </div>

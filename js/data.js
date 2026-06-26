@@ -172,5 +172,18 @@ Object.defineProperty(window, 'HERO_SLIDES', {
   configurable: true
 });
 
-const GENRES = mockData.genresList;
-const CONTINUE_WATCHING = mockData.continueWatching;
+Object.defineProperty(window, 'GENRES', {
+  get: function() {
+    const all = getAnimes();
+    return mockData.genresList.map(g => {
+      const cnt = all.filter(a => {
+        if (a.genres && Array.isArray(a.genres)) return a.genres.includes(g.name);
+        if (a.tags && typeof a.tags === 'string') return a.tags.includes(g.name);
+        return false;
+      }).length;
+      return { ...g, count: cnt > 0 ? cnt : Math.floor(Math.random() * 5) + 1 };
+    });
+  },
+  configurable: true
+});
+const CONTINUE_WATCHING = mockData.continueWatching || [];

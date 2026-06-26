@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHistory();
   renderStats();
   
+  const settingsContainer = document.getElementById('tab-settings');
+  if (settingsContainer && typeof renderSettingsPage === 'function') {
+    renderSettingsPage(settingsContainer);
+  }
+  
   // Setup tabs
   setupTabs();
 });

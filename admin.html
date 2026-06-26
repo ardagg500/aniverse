@@ -377,7 +377,8 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 50px;">
       
       <!-- 1. ANİME EKLEME FORMU -->
-      <div class="table-container" style="margin-bottom: 0;">
+      <!-- 1. ANİME EKLEME FORMU -->
+      <div class="table-container" style="margin-bottom: 0; max-height: calc(100vh - 140px); overflow-y: auto; display: flex; flex-direction: column;">
         <h2 class="table-header" style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem;">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
           Yeni Anime Ekle
@@ -386,6 +387,33 @@
           <div class="form-group" style="margin-bottom: 18px;">
             <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Anime Adı</label>
             <input type="text" id="anime-title-input" required placeholder="Örn: Solo Leveling" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:18px;">
+            <div class="form-group">
+              <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Stüdyo (Studio)</label>
+              <input type="text" id="anime-studio-input" required placeholder="Örn: MAPPA" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+            </div>
+            <div class="form-group">
+              <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Yayın Yılı (ReleaseYear)</label>
+              <input type="number" id="anime-year-input" required value="2026" min="1950" max="2035" style="width:100%; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:white; outline:none;" onfocus="this.style.borderColor='#ff3344'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Tür Seçimi (Genres - Çoklu Seçim)</label>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); max-height:110px; overflow-y:auto;">
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Aksiyon" checked> Aksiyon</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Romantik"> Romantik</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Bilim Kurgu"> Bilim Kurgu</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Fantastik" checked> Fantastik</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Macera"> Macera</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Dram"> Dram</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Komedi"> Komedi</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Gizem"> Gizem</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Doğaüstü"> Doğaüstü</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Mecha"> Mecha</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Spor"> Spor</label>
+              <label style="color:white; font-size:0.8rem; display:flex; gap:6px; align-items:center;"><input type="checkbox" name="anime-genre" value="Oyun"> Oyun</label>
+            </div>
           </div>
           <div class="form-group" style="margin-bottom: 18px;">
             <label style="display:block; color:var(--text-secondary); margin-bottom:8px; font-weight:600; font-size:0.85rem;">Kapak Fotoğrafı (URL)</label>
@@ -726,6 +754,12 @@
       const title = document.getElementById('anime-title-input').value;
       const cover = document.getElementById('anime-cover-input').value;
       const seasons = parseInt(document.getElementById('anime-seasons-input').value) || 1;
+      const studio = document.getElementById('anime-studio-input') ? document.getElementById('anime-studio-input').value.trim() : "MAPPA";
+      const year = parseInt(document.getElementById('anime-year-input') ? document.getElementById('anime-year-input').value : 2026) || 2026;
+      
+      const genreCheckboxes = document.querySelectorAll('input[name="anime-genre"]:checked');
+      const genres = Array.from(genreCheckboxes).map(cb => cb.value);
+      if (genres.length === 0) genres.push("Aksiyon");
 
       const epInputs = document.querySelectorAll('.anime-new-ep-input');
       const episodes = [];
@@ -754,12 +788,12 @@
         image: cover,
         banner: cover,
         description: `${title} efsanesi AniVerse platformunda.`,
-        genres: ["Aksiyon", "Macera", "Fantastik"],
+        genres: genres,
         rating: 8.8,
-        year: new Date().getFullYear(),
+        year: year,
         season: "Bahar",
         status: "Devam Ediyor",
-        studio: "AniVerse Studio",
+        studio: studio,
         totalEpisodes: episodes.length > 0 ? episodes.length : 12,
         popularity: 92,
         isNew: true,
