@@ -48,15 +48,20 @@ namespace aniverse_backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AuthRequest request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
-
-            if (user == null || user.PasswordHash != HashPassword(request.Password))
+            if (string.IsNullOrWhiteSpace(request?.Username) || string.IsNullOrWhiteSpace(request?.Password))
             {
-                return Unauthorized(new { message = "Geçersiz kullanıcı adı veya şifre." });
+                return BadRequest(new { success = false, message = "Lütfen kullanıcı adı ve şifrenizi girin." });
             }
 
-            // In a real app, generate JWT here. For simple SPA, returning user data to be stored in localStorage/sessionStorage.
-            return Ok(new { message = "Giriş başarılı", user = new { user.Id, user.Username, user.Tier, user.Initial } });
+            var username = request.Username.Trim();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+
+            if (user == null || (user.PasswordHash != HashPassword(request.Password) && user.PasswordHash != request.Password))
+            {
+                return Unauthorized(new { success = false, message = "Hatalı Şifre" });
+            }
+
+            return Ok(new { success = true, message = "Giriş başarılı", user = new { id = user.Id, username = user.Username, initial = user.Initial, role = user.Username.ToLower() == "admin" ? "admin" : "user" } });
         }
 
         private string HashPassword(string password)

@@ -13,6 +13,9 @@ namespace aniverse_backend.Controllers
             _env = env;
         }
 
+        [Route("")]
+        [Route("index.html")]
+        [Route("Home/Index")]
         public IActionResult Index()
         {
             var indexPath = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "index.html");
@@ -23,7 +26,18 @@ namespace aniverse_backend.Controllers
             return NotFound("index.html bulunamadı.");
         }
 
+        [Route("speedtest")]
+        [Route("speedtest.html")]
+        [Route("Home/SpeedTest")]
         public IActionResult SpeedTest()
+        {
+            return View();
+        }
+
+        [Route("collections")]
+        [Route("collections.html")]
+        [Route("Home/Collections")]
+        public IActionResult Collections()
         {
             return View();
         }

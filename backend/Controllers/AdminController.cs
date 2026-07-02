@@ -56,32 +56,74 @@ namespace aniverse_backend.Controllers
         [HttpGet("ReleaseCalendar")]
         public async Task<IActionResult> GetReleaseCalendar()
         {
-            // Requirement 3: Yayın Takvimi sorgusu gün ve saate göre sıralı olarak ön yüze çekilir
-            var animes = await _context.Animes.Include(a => a.Episodes).ToListAsync();
-            
-            var calendar = animes.OrderBy(a => a.Title).Select(a => new {
-                id = a.Id,
-                title = a.Title,
-                studio = a.Studio,
-                year = a.ReleaseYear,
-                genres = a.Genres,
-                imageUrl = a.ImageUrl,
-                rating = a.Rating
-            });
+            var schedule = await _context.ScheduleItems.ToListAsync();
+            var dayOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Pazartesi", 1 }, { "Salı", 2 }, { "Çarşamba", 3 }, { "Perşembe", 4 },
+                { "Cuma", 5 }, { "Cumartesi", 6 }, { "Pazar", 7 }
+            };
 
-            return Ok(calendar);
+            var sorted = schedule.OrderBy(s => dayOrder.ContainsKey(s.Day) ? dayOrder[s.Day] : 99)
+                                 .ThenBy(s => s.Time)
+                                 .Select(s => new {
+                                     id = s.Id,
+                                     animeId = s.AnimeId,
+                                     title = s.AnimeTitle,
+                                     day = s.Day,
+                                     time = s.Time,
+                                     imageUrl = s.ImageUrl,
+                                     genres = s.Genres
+                                 });
+
+            return Ok(sorted);
+        }
+
+        [HttpPost("schedule")]
+        public async Task<IActionResult> AddSchedule([FromBody] CreateScheduleDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Day) || dto.AnimeId <= 0)
+                return BadRequest(new { success = false, message = "Eksik bilgi" });
+
+            var anime = await _context.Animes.FindAsync(dto.AnimeId);
+            if (anime == null) return NotFound(new { success = false, message = "Anime bulunamadı" });
+
+            var item = new ScheduleItem
+            {
+                AnimeId = anime.Id,
+                AnimeTitle = anime.Title,
+                Day = dto.Day.Trim(),
+                Time = !string.IsNullOrWhiteSpace(dto.Time) ? dto.Time.Trim() : "20:00",
+                ImageUrl = anime.ImageUrl,
+                Genres = anime.Genres
+            };
+
+            _context.ScheduleItems.Add(item);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = item.Id });
+        }
+
+        [HttpDelete("schedule/{id}")]
+        public async Task<IActionResult> DeleteSchedule(int id)
+        {
+            var item = await _context.ScheduleItems.FindAsync(id);
+            if (item != null)
+            {
+                _context.ScheduleItems.Remove(item);
+                await _context.SaveChangesAsync();
+            }
+            return Ok(new { success = true });
         }
 
         [HttpGet("genres-count")]
         public async Task<IActionResult> GetGenresCount()
         {
-            // Requirement 3: LINQ sorgusuyla gerçek anime sayıları (_context.Animes.Count) çekilir
             var allAnimes = await _context.Animes.ToListAsync();
             var genreNames = new[] { "Aksiyon", "Romantik", "Bilim Kurgu", "Fantastik", "Macera", "Dram", "Komedi", "Gizem", "Doğaüstü", "Mecha", "Spor", "Oyun" };
 
             var result = genreNames.Select(g => new {
                 name = g,
-                count = allAnimes.Count(a => !string.IsNullOrEmpty(a.Genres) && a.Genres.Contains(g)) + allAnimes.Count(a => !string.IsNullOrEmpty(a.Tags) && a.Tags.Contains(g))
+                count = allAnimes.Count(a => (!string.IsNullOrEmpty(a.Genres) && a.Genres.Contains(g)) || (!string.IsNullOrEmpty(a.Tags) && a.Tags.Contains(g)))
             });
 
             return Ok(result);
@@ -135,5 +177,12 @@ namespace aniverse_backend.Controllers
         public string? Studio { get; set; }
         public int ReleaseYear { get; set; }
         public string? Genres { get; set; }
+    }
+
+    public class CreateScheduleDto
+    {
+        public int AnimeId { get; set; }
+        public string Day { get; set; } = string.Empty;
+        public string Time { get; set; } = string.Empty;
     }
 }

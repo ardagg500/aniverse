@@ -52,49 +52,64 @@ function handleRegister(e) {
 }
 
 // Handle Login
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   
   const usernameInput = document.getElementById('login-username').value.trim();
   const passwordInput = document.getElementById('login-password').value;
   
-  /* --- DEMO MODE: LocalStorage checks disabled ---
-  const users = getUsers();
-  
-  const user = users.find(u => 
-    u.username.toLowerCase() === usernameInput.toLowerCase() && 
-    u.password === passwordInput
-  );
-  ------------------------------------------------ */
-  
-  if (usernameInput.toLowerCase() === 'admin') {
-    const adminUser = {
-      id: 'admin-demo',
-      username: 'Admin',
-      initial: 'A',
-      role: 'admin'
-    };
-    loginUser(adminUser);
-  } else if (usernameInput.length > 0) {
-    const normalUser = {
-      id: 'user-' + Date.now(),
-      username: usernameInput,
-      initial: usernameInput.charAt(0).toUpperCase(),
-      role: 'user'
-    };
-    loginUser(normalUser);
-  } else {
-    showError('login-error', 'Lütfen geçerli bir kullanıcı adı girin.');
+  if (!usernameInput || !passwordInput) {
+    showError('login-error', 'Lütfen kullanıcı adı ve şifrenizi girin.');
+    return;
+  }
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Giriş Yapılıyor...';
+  }
+
+  try {
+    const response = await fetch('/Account/Login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username: usernameInput, password: passwordInput })
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch(err) {
+      data = { success: false, message: 'Hatalı Şifre' };
+    }
+
+    if (!response.ok || !data.success) {
+      showError('login-error', data.message || 'Hatalı Şifre');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Giriş Yap';
+      }
+      return;
+    }
+
+    loginUser(data.user);
+  } catch (error) {
+    showError('login-error', 'Hatalı Şifre');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Giriş Yap';
+    }
   }
 }
 
 // Login active user
 function loginUser(user) {
-  // Strip password before saving to active session
   const activeSession = {
     id: user.id,
     username: user.username,
-    initial: user.username.charAt(0).toUpperCase(),
+    initial: user.initial || user.username.charAt(0).toUpperCase(),
     role: user.role
   };
   
@@ -104,14 +119,16 @@ function loginUser(user) {
   
   Utils.showToast(`Hoş geldin, ${user.username}!`, 'success');
   
-  // Redirect to home page
   setTimeout(() => {
     window.location.href = 'index.html';
-  }, 1000);
+  }, 800);
 }
 
-// Logout active user (to be called from components.js)
-function logoutUser() {
+// Logout active user
+async function logoutUser() {
+  try {
+    await fetch('/Account/Logout', { method: 'POST' });
+  } catch(e) {}
   localStorage.removeItem('aniverse_currentUser');
   localStorage.removeItem('userRole');
   localStorage.removeItem('isLoggedIn');

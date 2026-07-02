@@ -46,15 +46,16 @@ const Components = {
         </a>
         
         <div class="navbar-center">
-          <a href="index.html" class="nav-link ${currentPath.includes('index.html') || currentPath === '/' ? 'active' : ''}">Ana Sayfa</a>
-          <a href="trending.html" class="nav-link ${currentPath.includes('trending.html') ? 'active' : ''}">Trendler</a>
-          <a href="genres.html" class="nav-link ${currentPath.includes('genres.html') ? 'active' : ''}">Türler</a>
-          <a href="mobile.html" class="nav-link ${currentPath.includes('mobile.html') ? 'active' : ''}">Mobil Uygulama</a>
-          ${localStorage.getItem('userRole') === 'admin' ? `<a href="admin.html" class="nav-link" style="color: #ff3344; text-shadow: 0 0 8px rgba(255,51,68,0.6); font-weight: 700;">Admin Paneli</a>` : ''}
+          <a href="/index.html" class="nav-link ${currentPath.includes('index.html') || currentPath === '/' ? 'active' : ''}">Ana Sayfa</a>
+          <a href="/trending.html" class="nav-link ${currentPath.includes('trending.html') ? 'active' : ''}">Trendler</a>
+          <a href="/genres.html" class="nav-link ${currentPath.includes('genres.html') ? 'active' : ''}">Türler</a>
+          <a href="/mobile.html" class="nav-link ${currentPath.includes('mobile.html') ? 'active' : ''}">Mobil Uygulama</a>
+          ${localStorage.getItem('userRole') === 'admin' ? `<a href="/admin.html" class="nav-link" style="color: #ff3344; text-shadow: 0 0 8px rgba(255,51,68,0.6); font-weight: 700;">Admin Paneli</a>` : ''}
         </div>
         
         <div class="navbar-right">
-          <a href="search.html" class="nav-search-btn" aria-label="Ara">
+          <button class="nav-search-btn" onclick="Utils.toggleTheme()" title="Tema Değiştir" style="margin-right: 4px;">🌓</button>
+          <a href="/search.html" class="nav-search-btn" aria-label="Ara">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </a>
           ${userHtml}
@@ -68,12 +69,13 @@ const Components = {
         <button class="mobile-nav-close" aria-label="Kapat">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
-        <a href="index.html" class="nav-link">Ana Sayfa</a>
-        <a href="search.html" class="nav-link">Keşfet & Ara</a>
-        <a href="profile.html" class="nav-link">Profilim</a>
-        <a href="trending.html" class="nav-link">Trendler</a>
-        <a href="genres.html" class="nav-link">Türler</a>
-        <a href="mobile.html" class="nav-link">Mobil Uygulama</a>
+        <a href="/index.html" class="nav-link">Ana Sayfa</a>
+        <a href="/search.html" class="nav-link">Keşfet & Ara</a>
+        <a href="/collections.html" class="nav-link">Koleksiyonlarım</a>
+        <a href="/profile.html" class="nav-link">Profilim</a>
+        <a href="/trending.html" class="nav-link">Trendler</a>
+        <a href="/genres.html" class="nav-link">Türler</a>
+        <a href="/mobile.html" class="nav-link">Mobil Uygulama</a>
       </div>
     `;
   },
@@ -236,11 +238,7 @@ const Components = {
     // Inject Sidebar
     const sidebarContainer = document.createElement('div');
     sidebarContainer.innerHTML = this.renderSidebar();
-    document.body.insertBefore(sidebarContainer.firstElementChild, document.body.firstChild);
-
-    // Inject Navbar
-    const navContainer = document.createElement('div');
-    navContainer.innerHTML = this.renderNavbar();
+    document.body.insertBefore(sidebarContainer.firstElementChild, document.body.fi    navContainer.innerHTML = this.renderNavbar();
     document.body.insertBefore(navContainer.firstElementChild, document.body.children[1]);
     
     // Inject Footer
@@ -257,34 +255,34 @@ const Components = {
     const currentPath = window.location.pathname;
     const isIndex = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/aniverse/');
     const isSearch = currentPath.includes('search.html');
-    const isProfile = currentPath.includes('profile.html');
+    const isCollections = currentPath.includes('collections.html') || currentPath.includes('Collections');
+    const isProfile = currentPath.includes('profile.html') && !isCollections;
     const isSpeedTest = currentPath.includes('speedtest.html') || currentPath.includes('SpeedTest');
     
     return `
       <aside class="sidebar">
         <div class="sidebar-top">
-          <a href="index.html" class="sidebar-icon ${isIndex ? 'active' : ''}" data-route="home" title="Ana Sayfa">
+          <a href="/index.html" class="sidebar-icon ${isIndex ? 'active' : ''}" data-route="home" title="Ana Sayfa">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
           </a>
-          <a href="search.html" class="sidebar-icon ${isSearch ? 'active' : ''}" data-route="search" title="Keşfet / Arama">
+          <a href="/search.html" class="sidebar-icon ${isSearch ? 'active' : ''}" data-route="search" title="Keşfet / Arama">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </a>
-          <a href="index.html?route=calendar" class="sidebar-icon" data-route="calendar" title="Yayın Takvimi">
+          <a href="/index.html?route=calendar" class="sidebar-icon" data-route="calendar" title="Yayın Takvimi">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           </a>
-          <a href="profile.html" class="sidebar-icon ${isProfile ? 'active' : ''}" data-route="watchlist" title="Koleksiyon / Favoriler">
+          <a href="/collections.html" class="sidebar-icon ${isCollections ? 'active' : ''}" data-route="watchlist" title="Koleksiyon / Favoriler">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           </a>
         </div>
         <div class="sidebar-bottom">
-          <a href="speedtest.html" class="sidebar-icon ${isSpeedTest ? 'active' : ''}" data-route="speedtest" title="Hız Testi">
+          <a href="/speedtest.html" class="sidebar-icon ${isSpeedTest ? 'active' : ''}" data-route="speedtest" title="Hız Testi">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
           </a>
-          <a href="profile.html#tab-settings" class="sidebar-icon" data-route="settings" title="Ayarlar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <a href="/profile.html#tab-settings" class="sidebar-icon" data-route="settings" title="Ayarlar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 0 2 2 0 0 1 0-2.83l-.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2 2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           </a>
         </div>
       </aside>
-    `;
   }
 };

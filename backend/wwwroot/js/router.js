@@ -132,7 +132,7 @@ function renderSearchPage(container) {
   container.innerHTML = html;
 }
 
-function renderCalendarPage(container) {
+async function renderCalendarPage(container) {
   let html = `
     <div class="container section" style="padding-top: 50px; min-height: 80vh;">
       <h1 class="text-3xl font-bold mb-8 text-center text-accent" style="text-shadow: 0 0 15px rgba(255,51,68,0.5);">Haftalık Yayın Takvimi</h1>
@@ -141,15 +141,47 @@ function renderCalendarPage(container) {
   `;
   
   const days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+  let scheduleItems = [];
+
+  try {
+    const res = await fetch('/api/admin/schedule');
+    if (res.ok) {
+      scheduleItems = await res.json();
+    }
+  } catch (e) {
+    console.warn('Backend schedule fetch failed, fallback to local data.');
+  }
+
   const allAnimes = typeof ANIME_DATA !== 'undefined' ? ANIME_DATA : [];
   
   days.forEach((day, dIdx) => {
-    const dayAnimes = allAnimes.filter((a, idx) => (a.releaseDay === day) || (idx % 7 === dIdx))
-      .sort((a, b) => {
-        const tA = a.releaseTime || `${18 + (a.id % 5)}:00`;
-        const tB = b.releaseTime || `${18 + (b.id % 5)}:00`;
-        return tA.localeCompare(tB);
-      });
+    let dayItems = [];
+    if (scheduleItems && scheduleItems.length > 0) {
+      dayItems = scheduleItems.filter(s => s.day.toLowerCase() === day.toLowerCase())
+        .map(s => ({
+          id: s.animeId || 1,
+          title: s.title,
+          image: s.imageUrl || 'assets/poster1.jpg',
+          genres: typeof s.genres === 'string' ? s.genres.split(',') : ['Aksiyon'],
+          time: s.time || '20:00',
+          epNum: '1'
+        }));
+    } else {
+      dayItems = allAnimes.filter((a, idx) => (a.releaseDay === day) || (idx % 7 === dIdx))
+        .sort((a, b) => {
+          const tA = a.releaseTime || `${18 + (a.id % 5)}:00`;
+          const tB = b.releaseTime || `${18 + (b.id % 5)}:00`;
+          return tA.localeCompare(tB);
+        })
+        .map(a => ({
+          id: a.id,
+          title: a.title,
+          image: a.image || a.banner,
+          genres: Array.isArray(a.genres) ? a.genres : ['Aksiyon'],
+          time: a.releaseTime || `${18 + (a.id % 5)}:00`,
+          epNum: a.episodes && a.episodes.length > 0 ? a.episodes.length : (a.totalEpisodes || 1)
+        }));
+    }
       
     html += `
       <div class="glass p-6" style="border-top: 3px solid #ff3344; background: rgba(18,18,22,0.7); border-radius: 14px; padding: 20px;">
@@ -157,22 +189,24 @@ function renderCalendarPage(container) {
         <div class="flex flex-col gap-3" style="display:flex; flex-direction:column; gap:12px;">
     `;
     
-    dayAnimes.forEach(anime => {
-      const epNum = anime.episodes && anime.episodes.length > 0 ? anime.episodes.length : anime.totalEpisodes || 1;
-      const time = anime.releaseTime || `${18 + (anime.id % 5)}:00`;
-      const genresStr = Array.isArray(anime.genres) ? anime.genres.slice(0, 2).join(', ') : 'Aksiyon';
-      
-      html += `
-        <a href="watch.html?id=${anime.id}&ep=1" class="flex gap-4 items-center p-3 hover-lift" style="display:flex; gap:12px; align-items:center; padding:10px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius: 10px; text-decoration:none; transition:all 0.2s;">
-          <img src="${anime.image || anime.banner}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink:0;">
-          <div style="flex:1; overflow:hidden;">
-            <div class="font-bold text-white" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.95rem;">${anime.title}</div>
-            <div class="text-xs text-secondary mt-1">🏷️ ${genresStr}</div>
-            <div class="text-sm font-semibold mt-1" style="color:#ff3344;">⏰ ${time} — Bölüm ${epNum}</div>
-          </div>
-        </a>
-      `;
-    });
+    if (dayItems.length === 0) {
+      html += `<div class="text-secondary text-sm">Bugün için yayın bulunmamaktadır.</div>`;
+    } else {
+      dayItems.forEach(item => {
+        const genresStr = Array.isArray(item.genres) ? item.genres.slice(0, 2).join(', ') : item.genres;
+        
+        html += `
+          <a href="/watch.html?id=${item.id}&ep=1" class="flex gap-4 items-center p-3 hover-lift" style="display:flex; gap:12px; align-items:center; padding:10px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius: 10px; text-decoration:none; transition:all 0.2s;">
+            <img src="${item.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink:0;">
+            <div style="flex:1; overflow:hidden;">
+              <div class="font-bold text-white" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.95rem;">${item.title}</div>
+              <div class="text-xs text-secondary mt-1">🏷️ ${genresStr}</div>
+              <div class="text-sm font-semibold mt-1" style="color:#ff3344;">⏰ ${item.time} — Bölüm ${item.epNum}</div>
+            </div>
+          </a>
+        `;
+      });
+    }
     
     html += `</div></div>`;
   });

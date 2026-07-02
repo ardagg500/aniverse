@@ -212,26 +212,13 @@
     <div class="container section pt-0">
       <div class="flex justify-center mb-8 animate-fade-in-up delay-3" style="display: flex; justify-content: center; width: 100%;">
         <div class="tabs" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
-          <button class="tab-btn active" data-target="tab-watchlist">İzleme Listem (<span id="watchlist-count">0</span>)</button>
-          <button class="tab-btn" data-target="tab-favorites">Favoriler (<span id="favorites-count">0</span>)</button>
-          <button class="tab-btn" data-target="tab-history">İzleme Geçmişi (<span id="history-count">0</span>)</button>
+          <a href="/collections.html" class="tab-btn" style="text-decoration:none;">⭐ Koleksiyonlarım</a>
+          <button class="tab-btn active" data-target="tab-history">İzleme Geçmişi (<span id="history-count">0</span>)</button>
           <button class="tab-btn" data-target="tab-settings" style="color:#ff3344; border-color:rgba(255,51,68,0.4);">⚙️ Ayarlar</button>
         </div>
       </div>
       
-      <div class="tab-content active" id="tab-watchlist">
-        <div class="grid grid-auto-fill" id="watchlist-grid">
-          <!-- Injected by profile.js -->
-        </div>
-      </div>
-      
-      <div class="tab-content" id="tab-favorites">
-        <div class="grid grid-auto-fill" id="favorites-grid">
-          <!-- Injected by profile.js -->
-        </div>
-      </div>
-      
-      <div class="tab-content" id="tab-history">
+      <div class="tab-content active" id="tab-history">
         <div id="history-list">
           <!-- Injected by profile.js -->
         </div>

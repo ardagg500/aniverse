@@ -11,10 +11,16 @@ namespace aniverse_backend.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Anime> Animes { get; set; }
         public DbSet<Episode> Episodes { get; set; }
+        public DbSet<ScheduleItem> ScheduleItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Seed Admin User (password: admin123 -> SHA256 hash: 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9)
+            modelBuilder.Entity<User>().HasData(
+                new User { Id = 1, Username = "admin", PasswordHash = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", Tier = "Premium" }
+            );
 
             // Seed Mock Data from Data.js
             modelBuilder.Entity<Anime>().HasData(
@@ -28,6 +34,13 @@ namespace aniverse_backend.Data
                 new Episode { Id = 1, AnimeId = 1, EpisodeNumber = 1, Title = "Zalimlik", Duration = "24m", ImageUrl = "https://images.unsplash.com/photo-1614583224978-f05ce51ef5fa?q=80&w=2072&auto=format&fit=crop", VideoUrl = "https://www.w3schools.com/html/mov_bbb.mp4" },
                 new Episode { Id = 2, AnimeId = 1, EpisodeNumber = 2, Title = "Eğitmen Sakonji", Duration = "24m", ImageUrl = "https://images.unsplash.com/photo-1614583225154-5fcdda07019e?q=80&w=2090&auto=format&fit=crop", VideoUrl = "https://www.w3schools.com/html/mov_bbb.mp4" },
                 new Episode { Id = 3, AnimeId = 3, EpisodeNumber = 1, Title = "En Zayıf Avcı", Duration = "24m", ImageUrl = "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?q=80&w=2071&auto=format&fit=crop", VideoUrl = "https://www.w3schools.com/html/mov_bbb.mp4" }
+            );
+
+            modelBuilder.Entity<ScheduleItem>().HasData(
+                new ScheduleItem { Id = 1, AnimeId = 1, AnimeTitle = "Demon Slayer", Day = "Pazartesi", Time = "20:00", ImageUrl = "https://images.unsplash.com/photo-1601850494422-3fb19e13b87b?q=80&w=2070&auto=format&fit=crop", Genres = "Aksiyon,Fantastik" },
+                new ScheduleItem { Id = 2, AnimeId = 2, AnimeTitle = "Jujutsu Kaisen", Day = "Çarşamba", Time = "21:30", ImageUrl = "https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=1974&auto=format&fit=crop", Genres = "Aksiyon,Doğaüstü" },
+                new ScheduleItem { Id = 3, AnimeId = 3, AnimeTitle = "Solo Leveling", Day = "Cumartesi", Time = "19:00", ImageUrl = "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?q=80&w=2071&auto=format&fit=crop", Genres = "Aksiyon,Macera" },
+                new ScheduleItem { Id = 4, AnimeId = 4, AnimeTitle = "Attack on Titan", Day = "Pazar", Time = "22:00", ImageUrl = "https://images.unsplash.com/photo-1578632284992-04533e4b0c2d?q=80&w=2070&auto=format&fit=crop", Genres = "Dram,Aksiyon" }
             );
         }
     }

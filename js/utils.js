@@ -402,9 +402,24 @@ const Utils = {
     });
   },
 
+  // ── Theme Toggle ──
+  toggleTheme() {
+    const isLight = document.body.classList.toggle('light-mode');
+    localStorage.setItem('aniverse_theme', isLight ? 'light' : 'dark');
+    this.showToast(isLight ? 'Açık tema aktif edildi.' : 'Koyu tema aktif edildi.', 'info');
+  },
+
+  initTheme() {
+    const savedTheme = localStorage.getItem('aniverse_theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+    }
+  },
+
   // ── Initialize Common Utilities ──
 
   initCommon() {
+    this.initTheme();
     this.initNavbarScroll();
     this.initMobileNav();
     this.initLazyLoading();
