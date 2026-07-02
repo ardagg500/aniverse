@@ -51,7 +51,7 @@ function handleRegister(e) {
   Utils.showToast('Kayıt işlemleri demo sürecinde kapalıdır.', 'error');
 }
 
-// Handle Login
+// Handle Login (Stateless Vercel Compatible)
 async function handleLogin(e) {
   e.preventDefault();
   
@@ -66,42 +66,29 @@ async function handleLogin(e) {
   const submitBtn = e.target.querySelector('button[type="submit"]');
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Giriş Yapılıyor...';
+    submitBtn.textContent = 'Doğrulanıyor...';
   }
 
-  try {
-    const response = await fetch('/Account/Login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username: usernameInput, password: passwordInput })
-    });
-
-    let data;
-    try {
-      data = await response.json();
-    } catch(err) {
-      data = { success: false, message: 'Hatalı Şifre' };
-    }
-
-    if (!response.ok || !data.success) {
-      showError('login-error', data.message || 'Hatalı Şifre');
+  // Vercel Stateless Auth Check
+  setTimeout(() => {
+    if (usernameInput.toLowerCase() === 'admin' && passwordInput === 'admin123') {
+      const adminUser = {
+        id: 1,
+        username: 'admin',
+        initial: 'A',
+        role: 'admin',
+        token: 'aniverse_secure_admin_token_' + Date.now()
+      };
+      localStorage.setItem('aniverse_auth_token', adminUser.token);
+      loginUser(adminUser);
+    } else {
+      showError('login-error', 'Hatalı Şifre');
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Giriş Yap';
       }
-      return;
     }
-
-    loginUser(data.user);
-  } catch (error) {
-    showError('login-error', 'Hatalı Şifre');
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Giriş Yap';
-    }
-  }
+  }, 400);
 }
 
 // Login active user
@@ -120,7 +107,7 @@ function loginUser(user) {
   Utils.showToast(`Hoş geldin, ${user.username}!`, 'success');
   
   setTimeout(() => {
-    window.location.href = 'index.html';
+    window.location.href = user.role === 'admin' ? 'admin.html' : 'index.html';
   }, 800);
 }
 

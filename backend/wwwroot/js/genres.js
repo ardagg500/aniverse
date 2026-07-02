@@ -1,33 +1,23 @@
 /* ======================================================
-   AniVerse — Genres Page Logic
+   AniVerse — Genres Page Logic (Vercel Ready)
    ====================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  Components.injectLayout();
+  if (typeof Components !== 'undefined') {
+    Components.injectLayout();
+  }
   renderGenresPage();
 });
 
-async function renderGenresPage() {
+window.addEventListener('aniverseDataLoaded', () => {
+  renderGenresPage();
+});
+
+function renderGenresPage() {
   const container = document.getElementById('genres-container');
   if (!container) return;
 
-  let genreList = typeof GENRES !== 'undefined' ? [...GENRES] : [];
-
-  try {
-    const res = await fetch('/api/admin/genres-count');
-    if (res.ok) {
-      const counts = await res.json();
-      genreList = genreList.map(g => {
-        const found = counts.find(c => c.name.toLowerCase() === g.name.toLowerCase());
-        return {
-          ...g,
-          count: found && found.count > 0 ? found.count : (g.count || 0)
-        };
-      });
-    }
-  } catch (e) {
-    console.warn('API genre count fetch error, fallback to static counts.');
-  }
+  const genreList = typeof GENRES !== 'undefined' ? [...GENRES] : [];
   
   let html = '';
   

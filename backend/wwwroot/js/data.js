@@ -181,9 +181,22 @@ Object.defineProperty(window, 'GENRES', {
         if (a.tags && typeof a.tags === 'string') return a.tags.includes(g.name);
         return false;
       }).length;
-      return { ...g, count: cnt > 0 ? cnt : Math.floor(Math.random() * 5) + 1 };
+      return { ...g, count: cnt };
     });
   },
   configurable: true
 });
 const CONTINUE_WATCHING = mockData.continueWatching || [];
+
+// Vercel / Live Hosting Data Fetch
+if (typeof window !== 'undefined') {
+  fetch('/data.json')
+    .then(res => res.json())
+    .then(data => {
+      if (data.animes) mockData.animes = data.animes;
+      if (data.genresList) mockData.genresList = data.genresList;
+      if (data.schedule) mockData.schedule = data.schedule;
+      window.dispatchEvent(new CustomEvent('aniverseDataLoaded'));
+    })
+    .catch(err => console.log('Using embedded mockData fallback:', err));
+}

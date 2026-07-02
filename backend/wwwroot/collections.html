@@ -29,6 +29,7 @@
       const container = document.getElementById('collections-container');
       if (container && typeof renderWatchlistPage === 'function') {
         renderWatchlistPage(container);
+        window.addEventListener('aniverseDataLoaded', () => renderWatchlistPage(container));
       }
     });
   </script>

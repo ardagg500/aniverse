@@ -141,16 +141,7 @@ async function renderCalendarPage(container) {
   `;
   
   const days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
-  let scheduleItems = [];
-
-  try {
-    const res = await fetch('/api/admin/schedule');
-    if (res.ok) {
-      scheduleItems = await res.json();
-    }
-  } catch (e) {
-    console.warn('Backend schedule fetch failed, fallback to local data.');
-  }
+  let scheduleItems = typeof mockData !== 'undefined' && mockData.schedule ? mockData.schedule : [];
 
   const allAnimes = typeof ANIME_DATA !== 'undefined' ? ANIME_DATA : [];
   
