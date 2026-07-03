@@ -238,7 +238,11 @@ const Components = {
     // Inject Sidebar
     const sidebarContainer = document.createElement('div');
     sidebarContainer.innerHTML = this.renderSidebar();
-    document.body.insertBefore(sidebarContainer.firstElementChild, document.body.fi    navContainer.innerHTML = this.renderNavbar();
+    document.body.insertBefore(sidebarContainer.firstElementChild, document.body.firstChild);
+    
+    // Inject Navbar
+    const navContainer = document.createElement('div');
+    navContainer.innerHTML = this.renderNavbar();
     document.body.insertBefore(navContainer.firstElementChild, document.body.children[1]);
     
     // Inject Footer
@@ -284,5 +288,6 @@ const Components = {
           </a>
         </div>
       </aside>
+    `;
   }
 };

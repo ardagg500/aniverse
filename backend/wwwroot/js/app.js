@@ -3,17 +3,24 @@
    ====================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Inject Navbar and Footer
-  Components.injectLayout();
-  
-  // Render Sections
+  if (typeof Components !== 'undefined') {
+    Components.injectLayout();
+  }
+  renderAllSections();
+});
+
+window.addEventListener('aniverseDataLoaded', () => {
+  renderAllSections();
+});
+
+function renderAllSections() {
   renderHero();
   renderContinueWatching();
   renderPopularWeekly();
   renderWeeklySchedule('Pazartesi');
-  setTimeout(() => switchScheduleDay('Pazartesi'), 100);
+  setTimeout(() => switchScheduleDay('Pazartesi'), 50);
   renderNewEpisodes();
-});
+}
 
 // 🌟 Render Hero Section 🌟
 function renderHero() {
@@ -123,10 +130,9 @@ function renderNewEpisodes() {
 // 🌟 Haftalık Yayın Takvimi Yönetimi 🌟
 function getBroadcastSchedule() {
   const stored = JSON.parse(localStorage.getItem('admin_broadcast_schedule') || 'null');
-  if (stored !== null) return stored;
-  return [
-    { id: 'sch_1', day: 'Pazartesi', animeId: 111, time: '20:30' }
-  ];
+  if (stored !== null && stored.length > 0) return stored;
+  if (typeof mockData !== 'undefined' && mockData.schedule) return mockData.schedule;
+  return [];
 }
 
 function renderWeeklySchedule(day = 'Pazartesi') {
@@ -134,20 +140,30 @@ function renderWeeklySchedule(day = 'Pazartesi') {
   if (!container) return;
 
   const schedule = getBroadcastSchedule();
-  const todayItems = schedule.filter(s => s.day === day);
+  const todayItems = schedule.filter(s => s.day && s.day.toLowerCase() === day.toLowerCase());
 
   if (todayItems.length === 0) {
-    container.innerHTML = `<p style="color:var(--text-tertiary); font-size:0.9rem; grid-column: 1/-1; text-align:center; padding:30px 0; background:rgba(255,255,255,0.02); border-radius:12px;">Bu gün için planlanmış bir anime yayını bulunmuyor. (Admin panelinden eklenebilir).</p>`;
+    container.innerHTML = `<p style="color:var(--text-tertiary); font-size:0.9rem; grid-column: 1/-1; text-align:center; padding:30px 0; background:rgba(255,255,255,0.02); border-radius:12px;">Bu gün için planlanmış bir anime yayını bulunmuyor.</p>`;
     return;
   }
 
   let html = '';
   todayItems.forEach(item => {
-    const anime = Utils.getAnimeById(item.animeId);
+    let anime = item.animeId ? Utils.getAnimeById(item.animeId) : null;
+    if (!anime && item.title) {
+      const allAnimes = typeof ANIME_DATA !== 'undefined' ? ANIME_DATA : [];
+      anime = allAnimes.find(a => a.title.toLowerCase() === item.title.toLowerCase()) || {
+        id: 1,
+        title: item.title,
+        image: item.image || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80',
+        rating: 9.0,
+        genres: typeof item.genres === 'string' ? item.genres.split(', ') : ['Aksiyon']
+      };
+    }
     if (!anime) return;
     html += `
       <div class="reveal-scale">
-        ${Components.renderAnimeCard(anime, `⏰ ${item.time}`)}
+        ${Components.renderAnimeCard(anime, `⏰ ${item.time || '20:00'}`)}
       </div>
     `;
   });
