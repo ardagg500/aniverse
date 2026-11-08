@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  passwordHash  String?
+  role          Role           @default(USER)
+  createdAt     DateTime       @default(now())
+  accounts      Account[]
+  sessions      Session[]
+  watchHistory  WatchHistory[]
+  favorites     Favorite[]
+  collections   Collection[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Anime {
+  id              String           @id @default(cuid())
+  title           String
+  slug            String           @unique
+  synopsis        String?          @db.Text
+  coverImage      String?
+  bannerImage     String?
+  year            Int?
+  season          String?
+  rating          Float            @default(0)
+  status          String?
+  createdAt       DateTime         @default(now())
+  episodes        Episode[]
+  genres          AnimeGenre[]
+  favorites       Favorite[]
+  collectionItems CollectionItem[]
+}
+
+model Episode {
+  id           String         @id @default(cuid())
+  animeId      String
+  number       Int
+  title        String
+  iframeUrl    String
+  duration     Int?
+  anime        Anime          @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  watchHistory WatchHistory[]
+
+  @@unique([animeId, number])
+}
+
+model Genre {
+  id     String       @id @default(cuid())
+  name   String
+  slug   String       @unique
+  animes AnimeGenre[]
+}
+
+model AnimeGenre {
+  animeId String
+  genreId String
+  anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, genreId])
+}
+
+model WatchHistory {
+  id              String   @id @default(cuid())
+  userId          String
+  episodeId       String
+  progressSeconds Int      @default(0)
+  watchedAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode         Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  animeId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  anime     Anime    @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, animeId])
+}
+
+model Collection {
+  id        String           @id @default(cuid())
+  userId    String
+  name      String
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CollectionItem[]
+}
+
+model CollectionItem {
+  id           String     @id @default(cuid())
+  collectionId String
+  animeId      String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  anime        Anime      @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, animeId])
+}
