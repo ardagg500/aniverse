@@ -4,3 +4,11 @@
 *.userosscache
 *.sln.docstates
 *.log
+node_modules/
+.next/
+out/
+.env
+.env.*
+.vercel
+next-env.d.ts
+*.tsbuildinfo
