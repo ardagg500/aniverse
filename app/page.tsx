@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_ANIMES, FALLBACK_GENRES } from "@/lib/fallback-data";
 import Hero from "@/components/Hero";
 import AnimeCard from "@/components/AnimeCard";
 
@@ -30,43 +31,40 @@ async function getHomeData() {
       }),
     ]);
 
+    if (trending.length === 0) {
+      return {
+        trending: [...FALLBACK_ANIMES].sort((a, b) => b.rating - a.rating),
+        recent: [...FALLBACK_ANIMES],
+        genres: FALLBACK_GENRES,
+      };
+    }
+
     return { trending, recent, genres };
   } catch {
-    return { trending: [], recent: [], genres: [] };
+    return {
+      trending: [...FALLBACK_ANIMES].sort((a, b) => b.rating - a.rating),
+      recent: [...FALLBACK_ANIMES],
+      genres: FALLBACK_GENRES,
+    };
   }
 }
 
 export default async function HomePage() {
   const { trending, recent, genres } = await getHomeData();
 
-  const featured = trending[0]
-    ? {
-        title: trending[0].title,
-        slug: trending[0].slug,
-        synopsis: trending[0].synopsis,
-        bannerImage: trending[0].bannerImage,
-        coverImage: trending[0].coverImage,
-        rating: trending[0].rating,
-        year: trending[0].year,
-        season: trending[0].season,
-        status: trending[0].status,
-        genres: trending[0].genres.map((g) => g.genre.name),
-      }
-    : {
-        title: "Solo Leveling: Arise",
-        slug: "solo-leveling-arise",
-        synopsis:
-          "Dünyanın en zayıf avcısı Sung Jinwoo'nun gölgelerin krallığına uzanan efsanevi yükselişi.",
-        bannerImage:
-          "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1600&q=80",
-        coverImage:
-          "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80",
-        rating: 9.4,
-        year: 2026,
-        season: "Kış",
-        status: "Devam Ediyor",
-        genres: ["Aksiyon", "Fantastik", "Macera"],
-      };
+  const heroSource = trending[0] || FALLBACK_ANIMES[0];
+  const featured = {
+    title: heroSource.title,
+    slug: heroSource.slug,
+    synopsis: heroSource.synopsis,
+    bannerImage: heroSource.bannerImage,
+    coverImage: heroSource.coverImage,
+    rating: heroSource.rating,
+    year: heroSource.year,
+    season: heroSource.season,
+    status: heroSource.status,
+    genres: heroSource.genres.map((g) => g.genre.name),
+  };
 
   return (
     <div className="space-y-16">
@@ -91,31 +89,23 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        {trending.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-            {trending.map((anime) => (
-              <AnimeCard
-                key={anime.id}
-                id={anime.id}
-                title={anime.title}
-                slug={anime.slug}
-                coverImage={anime.coverImage}
-                rating={anime.rating}
-                year={anime.year}
-                season={anime.season}
-                status={anime.status}
-                episodeCount={anime._count.episodes}
-                genres={anime.genres.map((g) => g.genre.name)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="glass rounded-2xl p-8 text-center text-zinc-400">
-            Veritabanında henüz anime bulunmuyor.{" "}
-            <code className="text-[#ff1e42]">npx prisma db seed</code> komutuyla
-            verileri yükleyebilirsiniz.
-          </div>
-        )}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+          {trending.map((anime) => (
+            <AnimeCard
+              key={anime.id}
+              id={anime.id}
+              title={anime.title}
+              slug={anime.slug}
+              coverImage={anime.coverImage}
+              rating={anime.rating}
+              year={anime.year}
+              season={anime.season}
+              status={anime.status}
+              episodeCount={anime._count.episodes}
+              genres={anime.genres.map((g) => g.genre.name)}
+            />
+          ))}
+        </div>
       </section>
 
       <section>
@@ -168,16 +158,7 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {(genres.length > 0
-            ? genres
-            : [
-                { id: "1", name: "Aksiyon", slug: "aksiyon" },
-                { id: "2", name: "Fantastik", slug: "fantastik" },
-                { id: "3", name: "Macera", slug: "macera" },
-                { id: "4", name: "Romantizm", slug: "romantizm" },
-                { id: "5", name: "Bilim Kurgu", slug: "bilim-kurgu" },
-              ]
-          ).map((genre) => (
+          {genres.map((genre) => (
             <Link
               key={genre.id}
               href={`/search?genre=${genre.slug}`}

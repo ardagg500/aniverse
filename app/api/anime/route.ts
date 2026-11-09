@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_ANIMES } from "@/lib/fallback-data";
 
 export const dynamic = "force-dynamic";
 
@@ -50,9 +51,12 @@ export async function GET(request: NextRequest) {
           : { createdAt: "desc" },
     });
 
+    if (animes.length === 0) {
+      return NextResponse.json({ animes: FALLBACK_ANIMES });
+    }
+
     return NextResponse.json({ animes });
-  } catch (error) {
-    console.error("GET /api/anime error:", error);
-    return NextResponse.json({ animes: [] }, { status: 200 });
+  } catch {
+    return NextResponse.json({ animes: FALLBACK_ANIMES }, { status: 200 });
   }
 }

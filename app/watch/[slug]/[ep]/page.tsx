@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_ANIMES } from "@/lib/fallback-data";
 import Player from "@/components/Player";
 
 export const revalidate = 60;
@@ -16,7 +17,7 @@ interface WatchPageProps {
 export default async function WatchPage({ params }: WatchPageProps) {
   const episodeNumber = Number(params.ep) || 1;
 
-  const anime = await prisma.anime
+  const dbAnime = await prisma.anime
     .findUnique({
       where: { slug: params.slug },
       include: {
@@ -26,6 +27,9 @@ export default async function WatchPage({ params }: WatchPageProps) {
       },
     })
     .catch(() => null);
+
+  const anime =
+    dbAnime || FALLBACK_ANIMES.find((item) => item.slug === params.slug) || null;
 
   if (!anime) {
     notFound();
@@ -37,7 +41,8 @@ export default async function WatchPage({ params }: WatchPageProps) {
       id: "",
       number: episodeNumber,
       title: `${episodeNumber}. Bölüm`,
-      iframeUrl: "",
+      iframeUrl:
+        "https://tau-video.xyz/embed/6a25f9ea2b34b506938a4106?vid=755569",
       duration: 1440,
     };
 

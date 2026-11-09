@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import React from "react";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_ANIMES } from "@/lib/fallback-data";
 import { authOptions } from "@/lib/auth";
 import FavoriteButton from "@/components/FavoriteButton";
 
@@ -16,7 +17,7 @@ interface AnimeDetailPageProps {
 }
 
 export default async function AnimeDetailPage({ params }: AnimeDetailPageProps) {
-  const anime = await prisma.anime
+  const dbAnime = await prisma.anime
     .findUnique({
       where: { slug: params.slug },
       include: {
@@ -30,15 +31,18 @@ export default async function AnimeDetailPage({ params }: AnimeDetailPageProps) 
     })
     .catch(() => null);
 
+  const anime =
+    dbAnime || FALLBACK_ANIMES.find((item) => item.slug === params.slug) || null;
+
   if (!anime) {
     notFound();
   }
 
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions).catch(() => null);
   const userId = (session?.user as { id?: string } | undefined)?.id;
 
   let isFavorited = false;
-  if (userId) {
+  if (userId && dbAnime) {
     const fav = await prisma.favorite
       .findUnique({
         where: {

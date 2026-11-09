@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_ANIMES, FALLBACK_GENRES } from "@/lib/fallback-data";
 import AnimeCard from "@/components/AnimeCard";
 
 export const revalidate = 60;
@@ -18,7 +19,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const selectedGenre = searchParams.genre?.trim() || "";
   const sort = searchParams.sort?.trim() || "latest";
 
-  const [animes, genres] = await Promise.all([
+  const [dbAnimes, dbGenres] = await Promise.all([
     prisma.anime
       .findMany({
         where: {
@@ -60,6 +61,24 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       })
       .catch(() => []),
   ]);
+
+  const genres = dbGenres.length > 0 ? dbGenres : FALLBACK_GENRES;
+
+  let animes = dbAnimes;
+  if (dbAnimes.length === 0 && !q && !selectedGenre) {
+    animes = [...FALLBACK_ANIMES];
+  } else if (dbAnimes.length === 0) {
+    animes = FALLBACK_ANIMES.filter((a) => {
+      const matchesQ =
+        !q ||
+        a.title.toLowerCase().includes(q.toLowerCase()) ||
+        a.synopsis.toLowerCase().includes(q.toLowerCase());
+      const matchesGenre =
+        !selectedGenre ||
+        a.genres.some((g) => g.genre.slug === selectedGenre);
+      return matchesQ && matchesGenre;
+    });
+  }
 
   return (
     <div className="space-y-10">
@@ -116,33 +135,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
         </form>
 
-        {genres.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Link
+            href="/search"
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              !selectedGenre
+                ? "bg-[#ff1e42] text-white shadow-neon-sm"
+                : "bg-white/5 text-zinc-300 hover:bg-white/10"
+            }`}
+          >
+            Tümü
+          </Link>
+          {genres.map((g) => (
             <Link
-              href="/search"
+              key={g.id}
+              href={`/search?genre=${g.slug}&sort=${sort}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                !selectedGenre
+                selectedGenre === g.slug
                   ? "bg-[#ff1e42] text-white shadow-neon-sm"
                   : "bg-white/5 text-zinc-300 hover:bg-white/10"
               }`}
             >
-              Tümü
+              {g.name}
             </Link>
-            {genres.map((g) => (
-              <Link
-                key={g.id}
-                href={`/search?genre=${g.slug}&sort=${sort}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                  selectedGenre === g.slug
-                    ? "bg-[#ff1e42] text-white shadow-neon-sm"
-                    : "bg-white/5 text-zinc-300 hover:bg-white/10"
-                }`}
-              >
-                {g.name}
-              </Link>
-            ))}
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
       {animes.length > 0 ? (
