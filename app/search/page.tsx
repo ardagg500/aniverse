@@ -64,21 +64,32 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const genres = dbGenres.length > 0 ? dbGenres : FALLBACK_GENRES;
 
-  let animes = dbAnimes;
-  if (dbAnimes.length === 0 && !q && !selectedGenre) {
-    animes = [...FALLBACK_ANIMES];
-  } else if (dbAnimes.length === 0) {
-    animes = FALLBACK_ANIMES.filter((a) => {
-      const matchesQ =
-        !q ||
-        a.title.toLowerCase().includes(q.toLowerCase()) ||
-        a.synopsis.toLowerCase().includes(q.toLowerCase());
-      const matchesGenre =
-        !selectedGenre ||
-        a.genres.some((g) => g.genre.slug === selectedGenre);
-      return matchesQ && matchesGenre;
-    });
-  }
+  const animes: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    coverImage: string | null;
+    rating: number;
+    year: number | null;
+    season: string | null;
+    status: string | null;
+    _count: { episodes: number };
+    genres: Array<{ genre: { name: string; slug: string } }>;
+  }> =
+    dbAnimes.length > 0
+      ? dbAnimes
+      : !q && !selectedGenre
+      ? [...FALLBACK_ANIMES]
+      : FALLBACK_ANIMES.filter((a) => {
+          const matchesQ =
+            !q ||
+            a.title.toLowerCase().includes(q.toLowerCase()) ||
+            a.synopsis.toLowerCase().includes(q.toLowerCase());
+          const matchesGenre =
+            !selectedGenre ||
+            a.genres.some((g) => g.genre.slug === selectedGenre);
+          return matchesQ && matchesGenre;
+        });
 
   return (
     <div className="space-y-10">
