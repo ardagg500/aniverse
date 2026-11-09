@@ -2,13 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-// ============================================================================
-// GELECEK MODEL İÇİN NOT:
-// Bu dosya tekil Anime Kartı (AnimeCard) bileşenidir.
-// Kart boyutu, köşe yuvarlaklığı, renkler ve rozet tasarımlarını buradan
-// değiştirebilirsiniz. Props yapısını değiştirmeyin.
-// ============================================================================
-
 export interface AnimeCardProps {
   id: string;
   title: string;
@@ -29,6 +22,7 @@ export default function AnimeCard({
   rating,
   year,
   season,
+  status,
   episodeCount,
   genres,
 }: AnimeCardProps) {
@@ -40,39 +34,48 @@ export default function AnimeCard({
       : "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80";
 
   return (
-    /* GELECEK MODEL İÇİN: Kart dış çerçevesi, arka plan rengi ve hover efektini buradan değiştirebilirsiniz */
     <Link
       href={`/anime/${slug}`}
-      className="group relative flex flex-col rounded-2xl overflow-hidden bg-[#111118] border border-zinc-800 hover:border-[#ff1e42] transition-colors"
+      className="group relative flex flex-col rounded-3xl overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 hover:border-red-500/50 hover:bg-white/10 hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(255,30,66,0.35)] active:scale-[0.98] transition-all duration-300"
     >
-      {/* GELECEK MODEL İÇİN: Görsel alanı ve üst rozetler */}
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-zinc-900">
+      {/* Görsel Alanı */}
+      <div className="relative aspect-[2/3] w-full overflow-hidden bg-zinc-950/60">
         <Image
           src={imageSrc}
           alt={title}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-          className="object-cover"
+          className="object-cover transition-transform duration-500 group-hover:scale-110 group-hover:brightness-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#09090d] via-transparent to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030307] via-transparent to-black/30" />
 
-        {/* GELECEK MODEL İÇİN: Puan rozeti rengini buradan değiştirebilirsiniz */}
-        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-black/80 text-xs font-bold text-amber-400">
-          ★ {rating.toFixed(1)}
+        {/* Puan Rozeti */}
+        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-xs font-bold text-amber-400 flex items-center gap-1 shadow-sm">
+          <span>★</span>
+          <span>{rating.toFixed(1)}</span>
         </div>
 
-        {/* GELECEK MODEL İÇİN: Bölüm sayısı rozeti */}
+        {/* Bölüm Sayısı Rozeti */}
         {episodeCount !== undefined && episodeCount > 0 && (
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-lg bg-[#ff1e42] text-white text-xs font-bold">
+          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-xl bg-red-600/80 backdrop-blur-md border border-red-500/30 text-white text-xs font-bold shadow-[0_0_12px_rgba(255,30,66,0.4)]">
             {episodeCount} Bölüm
           </div>
         )}
+
+        {/* Hover'da Merkez Oynat Rozeti */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/30 backdrop-blur-[2px]">
+          <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-[0_0_20px_rgba(255,30,66,0.8)] transform scale-75 group-hover:scale-100 transition-transform duration-300">
+            <svg className="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          </div>
+        </div>
       </div>
 
-      {/* GELECEK MODEL İÇİN: Kart alt metin ve tür etiketleri alanı */}
+      {/* Kart Alt Metin ve Tür Etiketleri */}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-bold text-white text-sm sm:text-base line-clamp-1 group-hover:text-[#ff1e42] transition-colors">
+          <h3 className="font-bold text-white text-sm sm:text-base line-clamp-1 group-hover:text-red-400 transition-colors">
             {title}
           </h3>
           <div className="mt-1 flex items-center gap-2 text-xs text-zinc-400">
@@ -83,6 +86,12 @@ export default function AnimeCard({
                 <span>{season}</span>
               </>
             )}
+            {status && (
+              <>
+                <span>•</span>
+                <span className="text-zinc-400">{status}</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -91,7 +100,7 @@ export default function AnimeCard({
             {genres.slice(0, 2).map((genre) => (
               <span
                 key={genre}
-                className="text-[11px] px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-300 border border-zinc-800"
+                className="text-[11px] px-2.5 py-0.5 rounded-lg bg-white/5 backdrop-blur-sm text-zinc-300 border border-white/10"
               >
                 {genre}
               </span>
