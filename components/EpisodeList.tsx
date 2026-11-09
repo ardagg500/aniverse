@@ -34,14 +34,14 @@ export default function EpisodeList({ animeSlug, episodes }: EpisodeListProps) {
             <Link
               key={ep.id}
               href={`/watch/${animeSlug}/${ep.number}`}
-              className="group rounded-2xl p-4 bg-[#111118] border border-zinc-800 hover:border-[#ff1e42] flex items-center justify-between transition-colors"
+              className="group rounded-2xl p-4 bg-white/5 backdrop-blur-md border border-white/10 hover:border-red-500/50 hover:bg-white/10 hover:shadow-[0_0_20px_rgba(220,38,38,0.25)] flex items-center justify-between transition-all duration-300"
             >
               <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-xl bg-[#ff1e42]/15 border border-[#ff1e42]/40 text-[#ff1e42] font-black flex items-center justify-center group-hover:bg-[#ff1e42] group-hover:text-white transition-colors">
+                <div className="w-11 h-11 rounded-xl bg-red-600/20 border border-red-500/40 text-red-400 font-black flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-all shadow-sm">
                   {ep.number}
                 </div>
                 <div>
-                  <h3 className="font-bold text-white group-hover:text-[#ff1e42] transition-colors">
+                  <h3 className="font-bold text-white group-hover:text-red-400 transition-colors">
                     {ep.title || `${ep.number}. Bölüm`}
                   </h3>
                   {ep.duration && (
@@ -51,14 +51,14 @@ export default function EpisodeList({ animeSlug, episodes }: EpisodeListProps) {
                   )}
                 </div>
               </div>
-              <span className="text-xs font-semibold text-zinc-400 group-hover:text-white">
+              <span className="text-xs font-semibold text-zinc-400 group-hover:text-white group-hover:translate-x-1 transition-all">
                 İzle →
               </span>
             </Link>
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl bg-[#111118] border border-zinc-800 p-6 text-zinc-400 text-sm">
+        <div className="rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 p-8 text-zinc-400 text-sm">
           Bu anime için henüz bölüm eklenmemiş.
         </div>
       )}

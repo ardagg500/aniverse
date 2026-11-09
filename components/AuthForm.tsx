@@ -64,30 +64,31 @@ export default function AuthForm({ mode }: AuthFormProps) {
   return (
     <div className="relative min-h-[75vh] flex items-center justify-center py-12 px-4 overflow-hidden">
       {/* ===================================================================== */}
-      {/* ODAKLANMIŞ KOSMİK NEBULA & KARA DELİK ARKA PLAN EFEKTİ                 */}
+      {/* HAVALI, DÖNEN VE PARLAYAN NEBULA / KARA DELİK EFEKTİ                  */}
       {/* ===================================================================== */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center -z-10">
-        {/* Dönen Akreasyon Diski */}
-        <div className="w-[520px] h-[520px] rounded-full blackhole-disk opacity-35 animate-spin-very-slow" />
-        {/* Ortadaki Kara Delik Çekirdeği */}
-        <div className="absolute w-[240px] h-[240px] rounded-full bg-[#030307] shadow-[0_0_60px_20px_rgba(0,0,0,1)] border border-red-500/20" />
-        {/* Neon Kırmızı ve Mor Nebula Işıması */}
-        <div className="absolute w-[640px] h-[640px] rounded-full cosmic-glow-red blur-3xl opacity-70 animate-pulse-slow" />
-        <div className="absolute w-[540px] h-[540px] rounded-full cosmic-glow-purple blur-3xl opacity-60 animate-pulse-slower" />
+        {/* Dönen Dış Nebula Akreasyon Halkası */}
+        <div className="w-[620px] h-[620px] rounded-full bg-gradient-to-tr from-purple-600/30 via-red-600/25 to-blue-500/25 blur-[75px] animate-spin-nebula" />
+        
+        {/* İçte Parlayan Kara Delik Halkası */}
+        <div className="absolute w-[380px] h-[380px] rounded-full bg-gradient-to-r from-red-600/40 via-purple-700/30 to-rose-500/40 blur-[50px] animate-pulse" />
+        
+        {/* Kara Delik Olay Ufku Çekirdeği */}
+        <div className="absolute w-[220px] h-[220px] rounded-full bg-[#05040a]/90 border border-purple-500/30 shadow-[0_0_80px_20px_rgba(0,0,0,0.9)]" />
       </div>
 
       {/* ===================================================================== */}
-      {/* GLASSMORPHISM FORM KARTI                                             */}
+      {/* ORTADAKİ CAM KART                                                    */}
       {/* ===================================================================== */}
-      <div className="relative w-full max-w-md rounded-3xl bg-white/5 backdrop-blur-2xl border border-white/15 p-8 sm:p-10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),0_0_35px_rgba(255,30,66,0.18)]">
+      <div className="relative w-full max-w-md bg-black/40 backdrop-blur-2xl border border-white/10 p-10 rounded-3xl shadow-2xl">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-purple-600 mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(255,30,66,0.5)] mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-purple-600 mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(220,38,38,0.5)] mb-4">
             <span className="text-white font-black text-2xl">A</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
             {isLogin ? "Tekrar Hoş Geldiniz" : "Yeni Hesap Oluştur"}
           </h1>
-          <p className="text-sm text-zinc-400 mt-1">
+          <p className="text-sm text-zinc-300 mt-1">
             {isLogin
               ? "AniVerse hesabınıza giriş yapın"
               : "AniVerse dünyasına ücretsiz katılın"}
@@ -95,7 +96,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         </div>
 
         {error && (
-          <div className="mb-5 p-3.5 rounded-2xl bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-semibold backdrop-blur-sm">
+          <div className="mb-5 p-3.5 rounded-2xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-semibold backdrop-blur-md">
             {error}
           </div>
         )}
@@ -112,7 +113,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Kullanıcı adınız"
-                className="w-full px-4 py-3.5 rounded-2xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 backdrop-blur-md focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 focus:shadow-[0_0_20px_rgba(255,30,66,0.4)] transition-all duration-300"
+                className="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-zinc-400 backdrop-blur-md focus:outline-none focus:border-red-500/60 focus:ring-2 focus:ring-red-500/30 focus:shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all duration-300"
               />
             </div>
           )}
@@ -127,7 +128,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="ornek@aniverse.com"
-              className="w-full px-4 py-3.5 rounded-2xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 backdrop-blur-md focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 focus:shadow-[0_0_20px_rgba(255,30,66,0.4)] transition-all duration-300"
+              className="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-zinc-400 backdrop-blur-md focus:outline-none focus:border-red-500/60 focus:ring-2 focus:ring-red-500/30 focus:shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all duration-300"
             />
           </div>
 
@@ -142,14 +143,14 @@ export default function AuthForm({ mode }: AuthFormProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3.5 rounded-2xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 backdrop-blur-md focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 focus:shadow-[0_0_20px_rgba(255,30,66,0.4)] transition-all duration-300"
+              className="w-full px-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-zinc-400 backdrop-blur-md focus:outline-none focus:border-red-500/60 focus:ring-2 focus:ring-red-500/30 focus:shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all duration-300"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-orange-500 hover:from-red-500 hover:to-orange-400 disabled:opacity-50 text-white font-bold text-sm shadow-[0_0_25px_rgba(255,30,66,0.5)] hover:shadow-[0_0_35px_rgba(255,30,66,0.8)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+            className="w-full py-4 rounded-2xl bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-bold text-sm shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:shadow-[0_0_30px_rgba(220,38,38,0.7)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
           >
             {loading
               ? "İşleniyor..."

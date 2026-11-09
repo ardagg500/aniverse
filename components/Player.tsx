@@ -27,7 +27,7 @@ export default function Player({ episodeId, iframeUrl, title }: PlayerProps) {
 
   return (
     /* GELECEK MODEL İÇİN: Video oynatıcı dış çerçevesini buradan değiştirebilirsiniz */
-    <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-800">
+    <div className="relative w-full aspect-video rounded-3xl overflow-hidden bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)]">
       {iframeUrl ? (
         <iframe
           src={iframeUrl}

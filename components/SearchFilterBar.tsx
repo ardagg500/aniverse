@@ -22,11 +22,11 @@ export default function SearchFilterBar({
 }: SearchFilterBarProps) {
   return (
     /* GELECEK MODEL İÇİN: Arama kutusu arka plan ve kenarlık renkleri */
-    <div className="rounded-3xl bg-[#111118] border border-zinc-800 p-6 sm:p-8">
+    <div className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 sm:p-8 shadow-2xl">
       <h1 className="text-2xl sm:text-4xl font-black text-white">
-        Anime <span className="text-[#ff1e42]">Keşfet & Ara</span>
+        Anime <span className="text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]">Keşfet & Ara</span>
       </h1>
-      <p className="text-sm text-zinc-400 mt-1">
+      <p className="text-sm text-zinc-300 mt-1">
         Aradığınız seriyi isme, türe veya puana göre filtreleyin
       </p>
 
@@ -41,13 +41,13 @@ export default function SearchFilterBar({
           name="q"
           defaultValue={q}
           placeholder="Anime adı veya konu ara..."
-          className="sm:col-span-2 px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-[#ff1e42]"
+          className="sm:col-span-2 px-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-zinc-400 backdrop-blur-md focus:outline-none focus:border-red-500/60 focus:ring-2 focus:ring-red-500/30 transition-all"
         />
 
         <select
           name="genre"
           defaultValue={selectedGenre}
-          className="px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ff1e42]"
+          className="px-4 py-3.5 rounded-2xl bg-black/60 border border-white/10 text-white backdrop-blur-md focus:outline-none focus:border-red-500/60 transition-all"
         >
           <option value="">Tüm Türler</option>
           {genres.map((g) => (
@@ -61,7 +61,7 @@ export default function SearchFilterBar({
           <select
             name="sort"
             defaultValue={sort}
-            className="flex-1 px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white focus:outline-none focus:border-[#ff1e42]"
+            className="flex-1 px-4 py-3.5 rounded-2xl bg-black/60 border border-white/10 text-white backdrop-blur-md focus:outline-none focus:border-red-500/60 transition-all"
           >
             <option value="latest">En Yeni</option>
             <option value="rating">En Yüksek Puan</option>
@@ -69,7 +69,7 @@ export default function SearchFilterBar({
           </select>
           <button
             type="submit"
-            className="px-6 py-3 rounded-xl bg-[#ff1e42] hover:bg-[#e50914] text-white font-bold text-sm transition-colors"
+            className="px-6 py-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all hover:scale-105 active:scale-95"
           >
             Filtrele
           </button>
@@ -82,8 +82,8 @@ export default function SearchFilterBar({
           href="/search"
           className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
             !selectedGenre
-              ? "bg-[#ff1e42] text-white"
-              : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
+              ? "bg-red-600 text-white shadow-[0_0_12px_rgba(220,38,38,0.4)]"
+              : "bg-white/5 text-zinc-300 hover:bg-white/10 border border-white/10"
           }`}
         >
           Tümü
@@ -96,8 +96,8 @@ export default function SearchFilterBar({
             }`}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
               selectedGenre === g.slug
-                ? "bg-[#ff1e42] text-white"
-                : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
+                ? "bg-red-600 text-white shadow-[0_0_12px_rgba(220,38,38,0.4)]"
+                : "bg-white/5 text-zinc-300 hover:bg-white/10 border border-white/10"
             }`}
           >
             {g.name}

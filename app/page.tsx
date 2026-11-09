@@ -101,22 +101,7 @@ export default async function HomePage() {
   }));
 
   return (
-    <div className="relative space-y-16 py-2 overflow-hidden">
-      {/* ===================================================================== */}
-      {/* DERİN UZAY (NEBULA / KARA DELİK) ARKA PLAN KATMANI                    */}
-      {/* ===================================================================== */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        {/* Üst Kara Delik Akreasyon Diski ve Yerçekimsel Parlama */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[720px] h-[360px] rounded-full blackhole-disk opacity-40 animate-pulse-slower" />
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[360px] h-[180px] rounded-full bg-[#030307] border border-red-500/25 shadow-[0_0_90px_35px_rgba(0,0,0,1)]" />
-
-        {/* Neon Kırmızı ve Mor Nebula Katmanları */}
-        <div className="absolute -top-32 -left-40 w-[620px] h-[620px] rounded-full cosmic-glow-red blur-3xl animate-pulse-slow opacity-75" />
-        <div className="absolute top-[35%] -right-48 w-[680px] h-[680px] rounded-full cosmic-glow-purple blur-3xl animate-pulse-slower opacity-70" />
-        <div className="absolute bottom-10 -left-20 w-[580px] h-[580px] rounded-full cosmic-glow-red blur-3xl opacity-60" />
-        <div className="absolute bottom-[20%] right-10 w-[500px] h-[500px] rounded-full cosmic-glow-purple blur-3xl opacity-50" />
-      </div>
-
+    <div className="relative space-y-16 py-2">
       {/* Hero Section */}
       <Hero anime={featured} />
 
