@@ -4,6 +4,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { FALLBACK_ANIMES } from "@/lib/fallback-data";
 import Player from "@/components/Player";
+import EpisodeList from "@/components/EpisodeList";
 
 export const revalidate = 60;
 
@@ -54,7 +55,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <Link
@@ -75,7 +76,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
           {prevEpisode && (
             <Link
               href={`/watch/${anime.slug}/${prevEpisode.number}`}
-              className="px-4 py-2.5 rounded-xl glass hover:bg-white/10 text-xs sm:text-sm font-semibold text-zinc-200 transition-all"
+              className="px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs sm:text-sm font-semibold text-zinc-200"
             >
               ← Önceki Bölüm
             </Link>
@@ -83,7 +84,7 @@ export default async function WatchPage({ params }: WatchPageProps) {
           {nextEpisode && (
             <Link
               href={`/watch/${anime.slug}/${nextEpisode.number}`}
-              className="px-5 py-2.5 rounded-xl bg-[#ff1e42] hover:bg-[#e50914] text-xs sm:text-sm font-bold text-white shadow-neon-sm transition-all"
+              className="px-5 py-2.5 rounded-xl bg-[#ff1e42] text-xs sm:text-sm font-bold text-white"
             >
               Sonraki Bölüm →
             </Link>
@@ -91,46 +92,13 @@ export default async function WatchPage({ params }: WatchPageProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-3 space-y-6">
-          <Player
-            episodeId={currentEpisode.id}
-            iframeUrl={currentEpisode.iframeUrl}
-            title={`${anime.title} - Bölüm ${currentEpisode.number}`}
-          />
-        </div>
+      <Player
+        episodeId={currentEpisode.id}
+        iframeUrl={currentEpisode.iframeUrl}
+        title={`${anime.title} - Bölüm ${currentEpisode.number}`}
+      />
 
-        <aside className="glass rounded-2xl p-5 flex flex-col max-h-[540px]">
-          <h2 className="text-lg font-extrabold text-white mb-4 flex items-center justify-between">
-            <span>Bölüm Listesi</span>
-            <span className="text-xs px-2.5 py-1 rounded-lg bg-[#ff1e42]/20 text-[#ff1e42]">
-              {anime.episodes.length} Bölüm
-            </span>
-          </h2>
-
-          <div className="overflow-y-auto space-y-2 pr-1">
-            {anime.episodes.map((ep) => {
-              const active = ep.number === currentEpisode.number;
-              return (
-                <Link
-                  key={ep.id}
-                  href={`/watch/${anime.slug}/${ep.number}`}
-                  className={`flex items-center justify-between p-3 rounded-xl text-sm font-medium transition-all ${
-                    active
-                      ? "bg-[#ff1e42] text-white shadow-neon-sm font-bold"
-                      : "bg-white/5 hover:bg-white/10 text-zinc-300"
-                  }`}
-                >
-                  <span className="truncate">
-                    {ep.number}. {ep.title || `${ep.number}. Bölüm`}
-                  </span>
-                  {active && <span className="text-xs">▶</span>}
-                </Link>
-              );
-            })}
-          </div>
-        </aside>
-      </div>
+      <EpisodeList animeSlug={anime.slug} episodes={anime.episodes} />
     </div>
   );
 }

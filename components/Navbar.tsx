@@ -5,6 +5,12 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import React, { useState } from "react";
 
+// ============================================================================
+// GELECEK MODEL İÇİN NOT:
+// Bu dosya sadece üst menü (Navbar) tasarımını içerir.
+// Renkleri, buton stillerini veya menü aralıklarını güvenle değiştirebilirsiniz.
+// ============================================================================
+
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -18,19 +24,20 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full glass border-b border-white/10">
+    /* GELECEK MODEL İÇİN: Navbar arka plan rengini ve border stilini buradan değiştirebilirsiniz */
+    <header className="sticky top-0 z-50 w-full bg-[#0b0b12]/90 backdrop-blur-md border-b border-zinc-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ff1e42] to-[#99001b] flex items-center justify-center shadow-neon-sm group-hover:shadow-neon transition-all duration-300">
-            <span className="text-white font-black text-xl tracking-tighter">
-              A
-            </span>
+        {/* GELECEK MODEL İÇİN: Logo tasarım alanı */}
+        <Link href="/" className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#ff1e42] flex items-center justify-center">
+            <span className="text-white font-black text-xl">A</span>
           </div>
-          <span className="text-2xl font-extrabold tracking-tight text-white">
+          <span className="text-2xl font-extrabold text-white">
             Ani<span className="text-[#ff1e42]">Verse</span>
           </span>
         </Link>
 
+        {/* GELECEK MODEL İÇİN: Masaüstü menü linklerinin renklerini buradan değiştirebilirsiniz */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => {
             const active = pathname === link.href;
@@ -38,10 +45,8 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-all duration-200 ${
-                  active
-                    ? "text-[#ff1e42] drop-shadow-[0_0_8px_rgba(255,30,66,0.6)]"
-                    : "text-zinc-300 hover:text-white"
+                className={`text-sm font-medium transition-colors ${
+                  active ? "text-[#ff1e42]" : "text-zinc-300 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -50,28 +55,26 @@ export default function Navbar() {
           })}
         </nav>
 
+        {/* GELECEK MODEL İÇİN: Sağ taraf arama ve kullanıcı butonları tasarım alanı */}
         <div className="hidden md:flex items-center gap-4">
           <Link
             href="/search"
-            className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white text-sm flex items-center gap-2 transition-all"
+            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-sm transition-colors"
           >
-            <span>Ara...</span>
-            <kbd className="text-xs px-1.5 py-0.5 rounded bg-black/40 text-zinc-400">
-              /
-            </kbd>
+            Anime Ara...
           </Link>
 
           {session?.user ? (
             <div className="flex items-center gap-3">
               <Link
                 href="/profile"
-                className="px-4 py-2 rounded-xl glass-red text-white text-sm font-semibold hover:bg-[#ff1e42]/25 transition-all"
+                className="px-4 py-2 rounded-xl bg-[#ff1e42]/15 border border-[#ff1e42]/40 text-white text-sm font-semibold"
               >
                 {session.user.name || session.user.email?.split("@")[0]}
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="px-3 py-2 rounded-xl bg-white/5 hover:bg-red-500/20 border border-white/10 text-xs text-zinc-300 hover:text-red-300 transition-all"
+                className="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs text-zinc-300"
               >
                 Çıkış
               </button>
@@ -80,13 +83,13 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <Link
                 href="/auth/login"
-                className="px-4 py-2 rounded-xl text-sm font-medium text-zinc-200 hover:text-white transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-medium text-zinc-200 hover:text-white"
               >
                 Giriş Yap
               </Link>
               <Link
                 href="/auth/register"
-                className="px-5 py-2.5 rounded-xl bg-[#ff1e42] hover:bg-[#e50914] text-white text-sm font-semibold shadow-neon-sm hover:shadow-neon transition-all duration-300"
+                className="px-5 py-2.5 rounded-xl bg-[#ff1e42] hover:bg-[#e50914] text-white text-sm font-semibold transition-colors"
               >
                 Kayıt Ol
               </Link>
@@ -94,33 +97,19 @@ export default function Navbar() {
           )}
         </div>
 
+        {/* Mobil Menü Butonu */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 rounded-lg bg-white/5 text-zinc-200 hover:text-white"
+          className="md:hidden p-2 rounded-lg bg-zinc-900 text-zinc-200"
           aria-label="Menü"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d={
-                mobileOpen
-                  ? "M6 18L18 6M6 6l12 12"
-                  : "M4 6h16M4 12h16M4 18h16"
-              }
-            />
-          </svg>
+          ☰
         </button>
       </div>
 
+      {/* GELECEK MODEL İÇİN: Mobil açılır menü tasarım alanı */}
       {mobileOpen && (
-        <div className="md:hidden glass border-t border-white/10 px-4 py-4 space-y-3">
+        <div className="md:hidden bg-[#0b0b12] border-t border-zinc-800 px-4 py-4 space-y-3">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -131,33 +120,6 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <div className="pt-2 border-t border-white/10 flex gap-3">
-            {session?.user ? (
-              <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="w-full py-2.5 rounded-xl bg-[#ff1e42] text-white font-semibold text-sm"
-              >
-                Çıkış Yap
-              </button>
-            ) : (
-              <>
-                <Link
-                  href="/auth/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex-1 text-center py-2.5 rounded-xl bg-white/10 text-white text-sm font-medium"
-                >
-                  Giriş Yap
-                </Link>
-                <Link
-                  href="/auth/register"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex-1 text-center py-2.5 rounded-xl bg-[#ff1e42] text-white text-sm font-semibold"
-                >
-                  Kayıt Ol
-                </Link>
-              </>
-            )}
-          </div>
         </div>
       )}
     </header>

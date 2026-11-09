@@ -2,6 +2,13 @@
 
 import React, { useEffect } from "react";
 
+// ============================================================================
+// GELECEK MODEL İÇİN NOT:
+// Bu bileşen Video Oynatıcı (Player) çerçevesidir.
+// Oynatıcı kenarlıklarını veya gölge efektini buradan değiştirebilirsiniz.
+// useEffect içindeki izleme geçmişi kaydına dokunmayın.
+// ============================================================================
+
 interface PlayerProps {
   episodeId: string;
   iframeUrl: string;
@@ -19,7 +26,8 @@ export default function Player({ episodeId, iframeUrl, title }: PlayerProps) {
   }, [episodeId]);
 
   return (
-    <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-white/15 shadow-neon">
+    /* GELECEK MODEL İÇİN: Video oynatıcı dış çerçevesini buradan değiştirebilirsiniz */
+    <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-800">
       {iframeUrl ? (
         <iframe
           src={iframeUrl}
