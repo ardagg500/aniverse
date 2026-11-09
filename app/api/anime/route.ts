@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 import { FALLBACK_ANIMES } from "@/lib/fallback-data";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
     const q = searchParams.get("q")?.trim() || "";
     const genre = searchParams.get("genre")?.trim() || "";
     const sort = searchParams.get("sort")?.trim() || "latest";
+
+    if (!isDbAvailable) {
+      return NextResponse.json({ animes: FALLBACK_ANIMES });
+    }
 
     const animes = await prisma.anime.findMany({
       where: {

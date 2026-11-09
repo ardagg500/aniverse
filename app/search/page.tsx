@@ -1,5 +1,5 @@
 import React from "react";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 import { FALLBACK_ANIMES, FALLBACK_GENRES } from "@/lib/fallback-data";
 import SearchFilterBar from "@/components/SearchFilterBar";
 import AnimeSection from "@/components/AnimeSection";
@@ -19,48 +19,50 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const selectedGenre = searchParams.genre?.trim() || "";
   const sort = searchParams.sort?.trim() || "latest";
 
-  const [dbAnimes, dbGenres] = await Promise.all([
-    prisma.anime
-      .findMany({
-        where: {
-          ...(q
-            ? {
-                OR: [
-                  { title: { contains: q, mode: "insensitive" } },
-                  { synopsis: { contains: q, mode: "insensitive" } },
-                ],
-              }
-            : {}),
-          ...(selectedGenre
-            ? {
-                genres: {
-                  some: {
-                    genre: {
-                      slug: selectedGenre,
+  const [dbAnimes, dbGenres] = isDbAvailable
+    ? await Promise.all([
+        prisma.anime
+          .findMany({
+            where: {
+              ...(q
+                ? {
+                    OR: [
+                      { title: { contains: q, mode: "insensitive" } },
+                      { synopsis: { contains: q, mode: "insensitive" } },
+                    ],
+                  }
+                : {}),
+              ...(selectedGenre
+                ? {
+                    genres: {
+                      some: {
+                        genre: {
+                          slug: selectedGenre,
+                        },
+                      },
                     },
-                  },
-                },
-              }
-            : {}),
-        },
-        include: {
-          genres: { include: { genre: true } },
-          _count: { select: { episodes: true } },
-        },
-        orderBy:
-          sort === "rating"
-            ? { rating: "desc" }
-            : sort === "year"
-            ? { year: "desc" }
-            : { createdAt: "desc" },
-      })
-      .catch(() => []),
-    prisma.genre
-      .findMany({
-        orderBy: { name: "asc" },
-      })
-      .catch(() => []),
-  ]);
+                  }
+                : {}),
+            },
+            include: {
+              genres: { include: { genre: true } },
+              _count: { select: { episodes: true } },
+            },
+            orderBy:
+              sort === "rating"
+                ? { rating: "desc" }
+                : sort === "year"
+                ? { year: "desc" }
+                : { createdAt: "desc" },
+          })
+          .catch(() => []),
+        prisma.genre
+          .findMany({
+            orderBy: { name: "asc" },
+          })
+          .catch(() => []),
+      ])
+    : [[], []];
 
   const genres = dbGenres.length > 0 ? dbGenres : FALLBACK_GENRES;
 

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import React from "react";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 import { FALLBACK_ANIMES } from "@/lib/fallback-data";
 import { authOptions } from "@/lib/auth";
 import AnimeDetailHeader from "@/components/AnimeDetailHeader";
@@ -16,19 +16,21 @@ interface AnimeDetailPageProps {
 }
 
 export default async function AnimeDetailPage({ params }: AnimeDetailPageProps) {
-  const dbAnime = await prisma.anime
-    .findUnique({
-      where: { slug: params.slug },
-      include: {
-        episodes: {
-          orderBy: { number: "asc" },
-        },
-        genres: {
-          include: { genre: true },
-        },
-      },
-    })
-    .catch(() => null);
+  const dbAnime = isDbAvailable
+    ? await prisma.anime
+        .findUnique({
+          where: { slug: params.slug },
+          include: {
+            episodes: {
+              orderBy: { number: "asc" },
+            },
+            genres: {
+              include: { genre: true },
+            },
+          },
+        })
+        .catch(() => null)
+    : null;
 
   const anime =
     dbAnime || FALLBACK_ANIMES.find((item) => item.slug === params.slug) || null;

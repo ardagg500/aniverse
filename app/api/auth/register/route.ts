@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +10,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Geçerli bir e-posta ve en az 6 karakterli şifre giriniz." },
         { status: 400 }
+      );
+    }
+
+    if (!isDbAvailable) {
+      return NextResponse.json(
+        { error: "Veritabanı henüz yapılandırılmamış. Lütfen DATABASE_URL ortam değişkenini ekleyin." },
+        { status: 503 }
       );
     }
 

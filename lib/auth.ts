@@ -4,10 +4,10 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { Adapter } from "next-auth/adapters";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as Adapter,
+  adapter: isDbAvailable ? (PrismaAdapter(prisma) as Adapter) : undefined,
   session: {
     strategy: "jwt",
   },
@@ -31,6 +31,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        if (!isDbAvailable) {
           return null;
         }
 

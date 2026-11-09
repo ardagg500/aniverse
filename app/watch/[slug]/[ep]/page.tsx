@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 import { FALLBACK_ANIMES } from "@/lib/fallback-data";
 import Player from "@/components/Player";
 import EpisodeList from "@/components/EpisodeList";
@@ -18,16 +18,18 @@ interface WatchPageProps {
 export default async function WatchPage({ params }: WatchPageProps) {
   const episodeNumber = Number(params.ep) || 1;
 
-  const dbAnime = await prisma.anime
-    .findUnique({
-      where: { slug: params.slug },
-      include: {
-        episodes: {
-          orderBy: { number: "asc" },
-        },
-      },
-    })
-    .catch(() => null);
+  const dbAnime = isDbAvailable
+    ? await prisma.anime
+        .findUnique({
+          where: { slug: params.slug },
+          include: {
+            episodes: {
+              orderBy: { number: "asc" },
+            },
+          },
+        })
+        .catch(() => null)
+    : null;
 
   const anime =
     dbAnime || FALLBACK_ANIMES.find((item) => item.slug === params.slug) || null;

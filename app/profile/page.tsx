@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import React from "react";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 import ProfileView from "@/components/ProfileView";
 
 export const dynamic = "force-dynamic";
@@ -15,36 +15,38 @@ export default async function ProfilePage() {
     redirect("/auth/login");
   }
 
-  const [favorites, history] = await Promise.all([
-    prisma.favorite
-      .findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        include: {
-          anime: {
+  const [favorites, history] = isDbAvailable
+    ? await Promise.all([
+        prisma.favorite
+          .findMany({
+            where: { userId },
+            orderBy: { createdAt: "desc" },
             include: {
-              genres: { include: { genre: true } },
-              _count: { select: { episodes: true } },
+              anime: {
+                include: {
+                  genres: { include: { genre: true } },
+                  _count: { select: { episodes: true } },
+                },
+              },
             },
-          },
-        },
-      })
-      .catch(() => []),
-    prisma.watchHistory
-      .findMany({
-        where: { userId },
-        orderBy: { watchedAt: "desc" },
-        take: 12,
-        include: {
-          episode: {
+          })
+          .catch(() => []),
+        prisma.watchHistory
+          .findMany({
+            where: { userId },
+            orderBy: { watchedAt: "desc" },
+            take: 12,
             include: {
-              anime: true,
+              episode: {
+                include: {
+                  anime: true,
+                },
+              },
             },
-          },
-        },
-      })
-      .catch(() => []),
-  ]);
+          })
+          .catch(() => []),
+      ])
+    : [[], []];
 
   const favoriteCards = favorites.map(({ anime }) => ({
     id: anime.id,

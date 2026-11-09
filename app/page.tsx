@@ -1,5 +1,5 @@
 import React from "react";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 import { FALLBACK_ANIMES, FALLBACK_GENRES } from "@/lib/fallback-data";
 import Hero from "@/components/Hero";
 import AnimeSection from "@/components/AnimeSection";
@@ -8,6 +8,14 @@ import GenreGrid from "@/components/GenreGrid";
 export const revalidate = 60;
 
 async function getHomeData() {
+  if (!isDbAvailable) {
+    return {
+      trending: [...FALLBACK_ANIMES].sort((a, b) => b.rating - a.rating),
+      recent: [...FALLBACK_ANIMES],
+      genres: FALLBACK_GENRES,
+    };
+  }
+
   try {
     const [trending, recent, genres] = await Promise.all([
       prisma.anime.findMany({

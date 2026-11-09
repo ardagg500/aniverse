@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDbAvailable } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const userId = (session?.user as { id?: string } | undefined)?.id;
 
-    if (!userId) {
+    if (!userId || !isDbAvailable) {
       return NextResponse.json({ saved: false }, { status: 200 });
     }
 
